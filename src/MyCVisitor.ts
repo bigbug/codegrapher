@@ -36,6 +36,12 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     return this.vars[v];
   }
 
+  private useConstant(v: string) : string {
+    const id = this.id();
+    this.addBlock("const", [], [id], v);
+    return id;
+  }
+
   private setVariable(v: string, newValue:string) : void {
     this.vars[v] = newValue;
   }
@@ -47,13 +53,6 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
   id(): string {
     return uuidv4();
   }
-
-  /*visitBlockItem(context: BlockItemContext) {
-    console.log(context);
-    const ret= uuidv4();
-    console.log(ret);
-    return ret;
-  }*/
 
   private addBlock(type: BlockType, inputs: string[] = [], outputs: string[] = [], configuration: string|string[] = []) : void {
     this.blocks.push({
@@ -70,7 +69,6 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       && context.children.length>1
     ) {
       const operator = get(context, "children[1].text");
-      console.log(operator);
       const expression = this.visit(get(context, "children[2]"));
       if(operator == "=") {
         this.setVariable(leftVar, expression);
@@ -180,8 +178,8 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     ) {
       const functionName = get(context, "children[0].text");
       const args = get(context, "children[2].children",[]).filter((i:ParserRuleContext)=>!(i instanceof TerminalNode));
-      console.log(functionName);
-      console.log(args.map((i:ParserRuleContext)=>i.text));
+      //console.log(functionName);
+      //console.log(args.map((i:ParserRuleContext)=>i.text));
       /*const argRes = args.map((i:ParserRuleContext)=>this.visit(i));
       return [];*/
     }
@@ -197,9 +195,19 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       && context.children[0].children[0]._symbol.type === CLexer.Identifier
     ) {
       return this.useVariable(context.text);
-      //console.log("variable");
-      //console.log(context.text);
-      //return "";
+    }
+
+    // Constant
+    if(context.children
+      && context.children.length===1
+      && context.children[0]
+      && context.children[0] instanceof PrimaryExpressionContext
+      && context.children[0].children
+      && context.children[0].children.length === 1
+      && context.children[0].children[0] instanceof TerminalNode
+      && context.children[0].children[0]._symbol.type === CLexer.Constant
+    ) {
+      return this.useConstant(context.text);
     }
 
     this.visitChildren(context);
@@ -214,8 +222,8 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     // single expression: left var:
     const leftVar = get(context, "children[2].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].text");
     if(`if(${leftVar}<0){${leftVar}=-${leftVar};}`===t) {
-      console.log("abs");
-      console.log(leftVar);
+      //console.log("abs");
+      //console.log(leftVar);
       const newValue = this.id();
       const oldValue = this.useVariable(leftVar);
       this.setVariable(leftVar, newValue);
@@ -246,7 +254,9 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       //console.log(ifExpr.text);
       //console.log(elseExpr.text);
       const out = this.id();
-      this.addBlock("switch", [this.visit(ifExpr), this.visit(condition), this.visit(elseExpr)], [out]);
+      const params = [this.visit(ifExpr), this.visit(condition), this.visit(elseExpr)];
+      this.setVariable(leftVar, out);
+      this.addBlock("switch", params, [out]);
       return out;
     }
     

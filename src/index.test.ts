@@ -1,59 +1,23 @@
-import { forEach } from "lodash";
-import { toTree } from ".";
-import {MyCVisitor} from "./MyCVisitor";
+import getDigraph from ".";
 
-//const input = 'if(b<0) {\nb=-b;\n}\nb=2+b;\nif(a>1&&a<10&&a==2) {b=10;} else {b=a;}';
+//const input = 'if(b<0) {\nb=-b;\n}\nb=2+b;\nif(a>1&&a<10&&a==2) {b=10;} else {b=a;} b=b * 2;c=a-b;';
 //const input = 'int a = a+2;';
-const input = 'a=b+b;';
+//const input = 'a=2+b;';
+const input = 'if(b==2) {b=10;} else {b=2*b;}';
 
-test("string tree", () => {
-    const v = new MyCVisitor();
-    const t = toTree(input);
-    console.log(t.toStringTree());
-    console.log(t.text);
-    const res = v.visit(t);
+
+
+test("a=2+b;", () => {
+    const res = getDigraph("a=2+b;");
+    expect(res).toMatchSnapshot();
+});
+
+test("if(b==2) {b=10;} else {b=2*b;}", () => {
+    const res = getDigraph("if(b==2) {b=10;} else {b=2*b;}");
+    expect(res).toMatchSnapshot();
+});
+
+test("arbitrary input", () => {
+    const res = getDigraph(input);
     console.log(res);
-    console.log(v.vars);
-    console.log(v.blocks);
-
-    const inputs : {[key: string] : string} = {};
-    let a = "digraph {\nnode [shape=box]\ngraph [rankdir=\"LR\"]\n";
-    a += v.blocks.map((i, idx)=>{
-        const nodeid = i.type + "_" + idx;
-
-        i.inputs.forEach(j=>{
-            inputs[j] = nodeid;
-        });
-
-        if(i.type === "var") {
-            return nodeid + " [label=\""+i.configuration+"\"]"
-        } else if (["sum", "multiply"].includes(i.type)) {
-            return nodeid + " [label=\""+(i.configuration as string[]).join("\\n")+"\"]"
-        } else if (["and", "or"].includes(i.type)) {
-            return nodeid + " [label=\""+(i.type==="and" ? "&&" : "||")+"\"]"
-        } else {
-            throw new Error("Unsupported node of type '"+i.type+"'");
-        }
-        return nodeid;
-    }).join("\n") + "\n";
-
-    let c = 0;
-    forEach(v.vars, (key:string, v)=>{
-        if(!inputs[key]) {
-            inputs[key] = "var_unused_" + c++;
-            a += inputs[key] + " [label=\""+v+"\"]\n";
-        }
-    })
-
-    v.blocks.map((i, idx) => {
-        const nodeid = i.type + "_" + idx;
-
-        i.outputs.forEach(j=>{
-            const z = inputs[j];
-            a+=nodeid+" -> "+z+"\n";
-        });
-    });
-
-    a+= "\n}";
-    console.log(a);
-})
+});
