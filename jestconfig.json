@@ -1,0 +1,23 @@
+{
+  "roots": ["<rootDir>/src"],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": ["js", "jsx", "ts", "tsx", "json", "node"],
+    "collectCoverage": false,
+    "mapCoverage": true,
+    "coverageDirectory": "coverage",
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "verbose": true,
+    "coverageThreshold": {
+      "global": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      }
+    }
+  }
