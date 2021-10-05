@@ -255,7 +255,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       //console.log(elseExpr.text);
       const out = this.id();
       const params = [this.visit(ifExpr), this.visit(condition), this.visit(elseExpr)];
-      this.setVariable(leftVar, out);
+      this.setVariable(assignmentVarIf, out);
       this.addBlock("switch", params, [out]);
       return out;
     }
