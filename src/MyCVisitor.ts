@@ -3,7 +3,7 @@ import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { assign, cond, get, isString } from 'lodash';
 import { CLexer } from './grammars/c/CLexer';
-import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext  } from './grammars/c/CParser';
+import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext, IterationStatementContext  } from './grammars/c/CParser';
 import {CVisitor} from './grammars/c/CVisitor'
 import { Block, BlockType } from './types';
 import { v4 as uuidv4 } from 'uuid';
@@ -440,5 +440,10 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       return out;
     }
     return children;
+  }
+
+  visitIterationStatement(context: IterationStatementContext) : string {
+    console.log("Iterations are not evaluated!");
+    return "";
   }
 }
