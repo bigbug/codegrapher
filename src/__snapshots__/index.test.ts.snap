@@ -1,24 +1,48 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`a=!b; 1`] = `
+"digraph {
+node [shape=box style=filled]
+graph [rankdir=\\"LR\\"]
+var_0 [label=\\"b\\"]
+not_1 [label=\\"not\\"]
+var_0 -> not_1
+}"
+`;
+
 exports[`a=2+b; 1`] = `
 "digraph {
-node [shape=box]
+node [shape=box style=filled]
 graph [rankdir=\\"LR\\"]
 const_0 [label=\\"2\\"]
 var_1 [label=\\"b\\"]
 sum_2 [label=\\"+\\\\n+\\"]
-var_unused_0 [label=\\"b\\"]
-var_1 -> var_unused_0
 const_0 -> sum_2
 var_1 -> sum_2
-var_unused_1 [label=\\"a\\"]
-sum_2 -> var_unused_1
+}"
+`;
+
+exports[`if(b==2) {a=2;} else {if(b==1) {a=1;} else {a=0;}} 1`] = `
+"digraph {
+node [shape=box style=filled]
+graph [rankdir=\\"LR\\"]
+var_0 [label=\\"b\\"]
+const_1 [label=\\"2\\"]
+const_2 [label=\\"1\\"]
+const_3 [label=\\"0\\"]
+multiswitch_4 [label=\\"cond\\\\n2
+1
+*\\"]
+var_0 -> multiswitch_4
+const_1 -> multiswitch_4
+const_2 -> multiswitch_4
+const_3 -> multiswitch_4
 }"
 `;
 
 exports[`if(b==2) {b=10;} else {b=2*b;} 1`] = `
 "digraph {
-node [shape=box]
+node [shape=box style=filled]
 graph [rankdir=\\"LR\\"]
 const_0 [label=\\"10\\"]
 var_1 [label=\\"b\\"]
@@ -34,7 +58,5 @@ var_1 -> multiply_5
 const_0 -> switch_6
 relational_3 -> switch_6
 multiply_5 -> switch_6
-var_unused_0 [label=\\"b\\"]
-switch_6 -> var_unused_0
 }"
 `;

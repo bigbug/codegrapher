@@ -31,7 +31,7 @@ export default function getDigraph(input: string) : string {
     const v = visit(input);
 
     const outputs : {[key: string] : string} = {};
-    let a = "digraph {\nnode [shape=box]\ngraph [rankdir=\"LR\"]\n";
+    let a = "digraph {\nnode [shape=box style=filled]\ngraph [rankdir=\"LR\"]\n";
     a += v.blocks.map((i, idx)=>{
         const nodeid = i.type + "_" + idx;
 
@@ -41,16 +41,20 @@ export default function getDigraph(input: string) : string {
 
         if(["var", "const"].includes(i.type)) {
             return nodeid + " [label=\""+i.configuration+"\"]"
+        } else if(["function"].includes(i.type)) {
+            return nodeid + " [label=\""+i.configuration+"\" color=green]"
         } else if (["sum", "multiply"].includes(i.type)) {
             return nodeid + " [label=\""+(i.configuration as string[]).join("\\n")+"\"]"
         } else if (["relational"].includes(i.type)) {
             return nodeid + " [label=\""+(i.configuration as string)+"\"]"
         } else if (["and", "or"].includes(i.type)) {
             return nodeid + " [label=\""+(i.type==="and" ? "&&" : "||")+"\"]"
-        } else if (["abs"].includes(i.type)) {
-            return nodeid + " [label=\"abs\"]"
+        } else if (["abs", "not"].includes(i.type)) {
+            return nodeid + " [label=\""+i.type+"\"]"
         } else if (["switch"].includes(i.type)) {
             return nodeid + " [label=\"1\\ncond\\n2\"]"
+        } else if (["multiswitch"].includes(i.type)) {
+            return nodeid + " [label=\"cond\\n"+i.configuration+"\"]"
         } else {
             throw new Error("Unsupported node of type '"+i.type+"'");
         }
@@ -73,13 +77,13 @@ export default function getDigraph(input: string) : string {
             a+= z + " -> " + nodeid + "\n";
         });
 
-        i.outputs.forEach(j => {
+        /*i.outputs.forEach(j => {
             if(Object.values(v.vars).includes(j)) {
                 const x = "var_unused_" + c++;
                 a += x + " [label=\""+getKeyByValue(v.vars, j)+"\"]\n";
                 a += nodeid + " -> " + x + "\n";
             }
-        })
+        })*/
     });
 
     a+= "}";

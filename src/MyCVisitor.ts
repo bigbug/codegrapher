@@ -1,12 +1,13 @@
 import { Parser, ParserRuleContext } from 'antlr4ts';
 import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor'
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
-import { cond, get, isString } from 'lodash';
+import { assign, cond, get, isString } from 'lodash';
 import { CLexer } from './grammars/c/CLexer';
-import { ArgumentExpressionListContext, AssignmentExpressionContext, BlockItemContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext  } from './grammars/c/CParser';
+import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext  } from './grammars/c/CParser';
 import {CVisitor} from './grammars/c/CVisitor'
 import { Block, BlockType } from './types';
 import { v4 as uuidv4 } from 'uuid';
+import { ParseTree } from 'antlr4ts/tree/ParseTree';
 
 // Extend the AbstractParseTreeVisitor to get default visitor behaviour
 export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVisitor<string> {
@@ -73,6 +74,18 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       if(operator == "=") {
         this.setVariable(leftVar, expression);
         return "";
+      } else if(operator === "+=") {
+        const operators = ["+", "+"];
+        const parts = [this.useVariable(leftVar), expression];
+        const output = this.id();
+        this.addBlock("sum", parts, [output], operators);
+        return output;
+      } else if(operator === "-=") {
+        const operators = ["+", "-"];
+        const parts = [this.useVariable(leftVar), expression];
+        const output = this.id();
+        this.addBlock("sum", parts, [output], operators);
+        return output;
       } else {
         throw new Error("Operator '"+operator+"' is not supported yet!");
       }
@@ -177,7 +190,12 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       && context.children[3].text === ")"
     ) {
       const functionName = get(context, "children[0].text");
-      const args = get(context, "children[2].children",[]).filter((i:ParserRuleContext)=>!(i instanceof TerminalNode));
+      const args : ParserRuleContext[] = get(context, "children[2].children",[]).filter((i:ParserRuleContext)=>!(i instanceof TerminalNode));
+      const argResults = args.map(i=>this.visit(i));
+
+      const out = this.id();
+      this.addBlock("function", argResults, [out], functionName);
+      return out;
       //console.log(functionName);
       //console.log(args.map((i:ParserRuleContext)=>i.text));
       /*const argRes = args.map((i:ParserRuleContext)=>this.visit(i));
@@ -210,8 +228,111 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       return this.useConstant(context.text);
     }
 
-    this.visitChildren(context);
-    return "";
+    //throw new Error("unresolved postfix: " + context.text);
+    return this.visitChildren(context);
+    //return "";
+  }
+
+  /*visitMultiportSwitch(context: SelectionStatementContext, variable: string) {
+    const assignmentVarIf = get(context, "children[4].children[0].children[1].children[0].children[0].children[0].children[0].children[0].children[0].children[0].text");
+    const ifStatementChildren = get(context, "children[4].children[0].children[1].children[0].children");
+
+  }*/
+
+  /*visitUnaryExpression(context: UnaryExpressionContext) : string {
+    console.log(context);
+    return "unary!"
+  }*/
+
+  visitMultiSwitch(conditionVariable: string, assignmentVar: string, context: SelectionStatementContext) : {
+    condition: string,
+    value: ParseTree,
+  }[]|false {
+
+    let res : {
+      condition: string,
+      value: ParseTree,
+    }[] = [];
+    
+    const conditionVar = get(context, "children[2].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].text");
+    
+    // single expression: assignment Var if
+    const assignmentVarIf = get(context, "children[4].children[0].children[1].children[0].children[0].children[0].children[0].children[0].children[0].children[0].text");
+    const ifStatementChildren = get(context, "children[4].children[0].children[1].children[0].children");
+    const ifStatementsOne = ifStatementChildren?.length===1 && ifStatementChildren[0] instanceof StatementContext;
+
+    // single expression: assignment Var else
+    const assignmentVarElse = get(context, "children[6].children[0].children[1].children[0].children[0].children[0].children[0].children[0].children[0].children[0].text");
+    const elseStatementChildren = get(context, "children[6].children[0].children[1].children[0].children");
+    const elseStatementsOne = elseStatementChildren?.length===1 && elseStatementChildren[0] instanceof StatementContext;
+
+
+    if(!assignmentVarIf || assignmentVarIf!==assignmentVar) {
+      return false;
+    }
+    
+    if(!conditionVar || conditionVar!==conditionVariable) {
+      return false;
+    }
+
+    if(assignmentVarIf
+      && ifStatementsOne
+    ) {
+      const ifExpr = ifStatementChildren[0].children[0].children[0].children[0].children[2];
+      const conditionVar = get(context, "children[2].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[2].text");
+      res = [...res, {
+        condition: conditionVar,
+        value: ifExpr
+      }];
+    }
+
+    if(assignmentVarIf
+      && assignmentVarIf === assignmentVarElse
+      && ifStatementsOne
+      && elseStatementsOne
+    ) {
+      const elseExpr = elseStatementChildren[0].children[0].children[0].children[0].children[2];
+      //console.log("switch");
+      //console.log(condition.text);
+      //this.visitChildren(condition);
+      //console.log(ifExpr.text);
+      //console.log(elseExpr.text);
+      res = [...res, {
+        condition: "*",
+        value: elseExpr
+      }];
+      return res;
+    } else  // Another if in else statement:
+    if(context.children
+      && context.children.length>6
+      && context.children[6] instanceof StatementContext
+      && context.children[6].children
+      && context.children[6].children.length===1
+      && context.children[6].children[0]
+      && context.children[6].children[0] instanceof CompoundStatementContext
+      && context.children[6].children[0].children
+      && context.children[6].children[0].children.length===3
+      && context.children[6].children[0].children[0] instanceof TerminalNode
+      && context.children[6].children[0].children[1] instanceof BlockItemListContext
+      && context.children[6].children[0].children[2] instanceof TerminalNode
+      && context.children[6].children[0].children[1].children
+      && context.children[6].children[0].children[1].children.length===1
+      && context.children[6].children[0].children[1].children[0] instanceof BlockItemContext
+      && context.children[6].children[0].children[1].children[0].children
+      && context.children[6].children[0].children[1].children[0].children.length===1
+      && context.children[6].children[0].children[1].children[0].children[0] instanceof StatementContext
+      && context.children[6].children[0].children[1].children[0].children[0].children
+      && context.children[6].children[0].children[1].children[0].children[0].children.length===1
+      && context.children[6].children[0].children[1].children[0].children[0].children[0] instanceof SelectionStatementContext
+    ) {
+      const sub = this.visitMultiSwitch(conditionVariable, assignmentVarIf, context.children[6].children[0].children[1].children[0].children[0].children[0]);
+      if(sub) {
+        res = [...res, ...sub];
+        return res;
+      }
+    }
+
+    return false;
   }
 
   visitSelectionStatement(context: SelectionStatementContext) : string {
@@ -259,8 +380,65 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       this.addBlock("switch", params, [out]);
       return out;
     }
-    
+
+    if(assignmentVarIf) {
+      //console.log("unresolved if");
+
+      const ms = this.visitMultiSwitch(leftVar, assignmentVarIf, context);
+      
+      if(ms) {
+        const out = this.id();
+        const params = [this.useVariable(leftVar), ...ms.map(i=>this.visit(i.value))];
+        this.setVariable(assignmentVarIf, out);
+        this.addBlock("multiswitch", params, [out], ms.map(i=>i.condition).join("\n"));
+        return out;
+      }
+
+      /*if(context.children
+        && context.children.length>6
+        && context.children[6] instanceof StatementContext
+        && context.children[6].children
+        && context.children[6].children.length===1
+        && context.children[6].children[0]
+        && context.children[6].children[0] instanceof CompoundStatementContext
+        && context.children[6].children[0].children
+        && context.children[6].children[0].children.length===3
+        && context.children[6].children[0].children[0] instanceof TerminalNode
+        && context.children[6].children[0].children[1] instanceof BlockItemListContext
+        && context.children[6].children[0].children[2] instanceof TerminalNode
+        && context.children[6].children[0].children[1].children
+        && context.children[6].children[0].children[1].children.length===1
+        && context.children[6].children[0].children[1].children[0] instanceof BlockItemContext
+        && context.children[6].children[0].children[1].children[0].children
+        && context.children[6].children[0].children[1].children[0].children.length===1
+        && context.children[6].children[0].children[1].children[0].children[0] instanceof StatementContext
+        && context.children[6].children[0].children[1].children[0].children[0].children
+        && context.children[6].children[0].children[1].children[0].children[0].children.length===1
+        && context.children[6].children[0].children[1].children[0].children[0].children[0] instanceof SelectionStatementContext
+      )
+        console.log(get(context, "children[6].children[0].children[1].children[0].children[0].children[0]"));
+      */
+    }
+
     return this.visitChildren(context);
   }
 
+  visitUnaryExpression(context: UnaryExpressionContext) : string {
+    const children = this.visitChildren(context);
+    
+    if(context.children
+      && context.children.length===2
+      && context.children[0] instanceof UnaryOperatorContext
+      && context.children[0].children
+      && context.children[0].children.length===1
+      && context.children[0].children[0] instanceof TerminalNode
+      && context.children[0].children[0]._symbol.type === CLexer.Not
+    ) {
+      const out = this.id();
+      const params = [this.visit(context.children[1])];
+      this.addBlock("not", params, [out]);
+      return out;
+    }
+    return children;
+  }
 }
