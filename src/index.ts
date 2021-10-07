@@ -43,7 +43,7 @@ export default function getDigraph(input: string) : string {
             return nodeid + " [label=\""+i.configuration+"\"]"
         } else if(["function"].includes(i.type)) {
             return nodeid + " [label=\""+i.configuration+"\" color=green]"
-        } else if (["sum", "multiply"].includes(i.type)) {
+        } else if (["sum", "multiply", "shift"].includes(i.type)) {
             return nodeid + " [label=\""+(i.configuration as string[]).join("\\n")+"\"]"
         } else if (["relational"].includes(i.type)) {
             return nodeid + " [label=\""+(i.configuration as string)+"\"]"

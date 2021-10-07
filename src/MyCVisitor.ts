@@ -3,7 +3,7 @@ import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { assign, cond, get, isString } from 'lodash';
 import { CLexer } from './grammars/c/CLexer';
-import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext, IterationStatementContext  } from './grammars/c/CParser';
+import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext, IterationStatementContext, ShiftExpressionContext  } from './grammars/c/CParser';
 import {CVisitor} from './grammars/c/CVisitor'
 import { Block, BlockType } from './types';
 import { v4 as uuidv4 } from 'uuid';
@@ -239,11 +239,6 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
 
   }*/
 
-  /*visitUnaryExpression(context: UnaryExpressionContext) : string {
-    console.log(context);
-    return "unary!"
-  }*/
-
   visitMultiSwitch(conditionVariable: string, assignmentVar: string, context: SelectionStatementContext) : {
     condition: string,
     value: ParseTree,
@@ -423,9 +418,20 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     return this.visitChildren(context);
   }
 
+  visitShiftExpression(context: ShiftExpressionContext) : string {
+    if(context.children
+      && context.children.length>=3
+    ) {
+      const operators = context.children.filter((i,idx)=>idx%2===1).map(i=>i.text);
+      const parts : string[] = context.children.filter((i,idx)=>idx%2===0).map(i=>this.visit(i)).filter((i)=>isString(i));
+      const output = this.id();
+      this.addBlock("shift", parts, [output], operators);
+      return output;
+    }
+    return this.visitChildren(context);
+  }
+
   visitUnaryExpression(context: UnaryExpressionContext) : string {
-    const children = this.visitChildren(context);
-    
     if(context.children
       && context.children.length===2
       && context.children[0] instanceof UnaryOperatorContext
@@ -439,7 +445,11 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       this.addBlock("not", params, [out]);
       return out;
     }
-    return children;
+    /*if(context.children
+      && context.children.length>1) {
+        console.log("unary: " + context.text);
+      }*/
+    return this.visitChildren(context);
   }
 
   visitIterationStatement(context: IterationStatementContext) : string {
