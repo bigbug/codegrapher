@@ -51,6 +51,8 @@ export default function getDigraph(input: string) : string {
             return nodeid + " [label=\""+(i.type==="and" ? "&&" : "||")+"\"]"
         } else if (["abs", "not"].includes(i.type)) {
             return nodeid + " [label=\""+i.type+"\"]"
+        } else if (["gain"].includes(i.type)) {
+            return nodeid + " [label=\""+i.configuration+"\"]"
         } else if (["switch"].includes(i.type)) {
             return nodeid + " [label=\"1\\ncond\\n2\"]"
         } else if (["multiswitch"].includes(i.type)) {

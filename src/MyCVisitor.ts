@@ -103,9 +103,12 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     if(context.children
       && context.children.length>=3
     ) {
+      //console.log(context.children);
       const operators = context.children.filter((i,idx)=>idx%2===1).map(i=>i.text);
       operators.splice(0,0,"+");
-      const parts : string[] = context.children.filter((i,idx)=>idx%2===0).map(i=>this.visit(i)).filter((i)=>isString(i));
+      const parts : string[] = context.children.filter((i,idx)=>idx%2===0).map(i=>this.visit(i));
+      //console.log(context.children.filter((i,idx)=>idx%2===0));
+      //console.log(context.children.filter((i,idx)=>idx%2===0).map(i=>this.visit(i)));
       const output = this.id();
       this.addBlock("sum", parts, [output], operators);
       return output;
@@ -119,7 +122,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     ) {
       const operators = context.children.filter((i,idx)=>idx%2===1).map(i=>i.text);
       operators.splice(0,0,"*");
-      const parts : string[] = context.children.filter((i,idx)=>idx%2===0).map(i=>this.visit(i)).filter((i)=>isString(i));
+      const parts : string[] = context.children.filter((i,idx)=>idx%2===0).map(i=>this.visit(i));
       const output = this.id();
       this.addBlock("multiply", parts, [output], operators);
       return output;
@@ -131,7 +134,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     if(context.children
       && context.children.length>=3
     ) {
-      const parts : string[] = context.children.filter((i,idx)=>idx%2===0).map(i=>this.visit(i)).filter((i)=>isString(i));
+      const parts : string[] = context.children.filter((i,idx)=>idx%2===0).map(i=>this.visit(i));
       const output = this.id();
       this.addBlock("and", parts, [output]);
       return output;
@@ -376,6 +379,15 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       return out;
     }
 
+    if(assignmentVarIf && ifStatementsOne) {
+      const ifExpr = ifStatementChildren[0].children[0].children[0].children[0].children[2];
+      const out = this.id();
+      const params = [this.visit(ifExpr), this.visit(condition), this.useVariable(assignmentVarIf)];
+      this.setVariable(assignmentVarIf, out);
+      this.addBlock("switch", params, [out]);
+      return out;
+    }
+
     if(assignmentVarIf) {
       //console.log("unresolved if");
 
@@ -388,31 +400,6 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
         this.addBlock("multiswitch", params, [out], ms.map(i=>i.condition).join("\n"));
         return out;
       }
-
-      /*if(context.children
-        && context.children.length>6
-        && context.children[6] instanceof StatementContext
-        && context.children[6].children
-        && context.children[6].children.length===1
-        && context.children[6].children[0]
-        && context.children[6].children[0] instanceof CompoundStatementContext
-        && context.children[6].children[0].children
-        && context.children[6].children[0].children.length===3
-        && context.children[6].children[0].children[0] instanceof TerminalNode
-        && context.children[6].children[0].children[1] instanceof BlockItemListContext
-        && context.children[6].children[0].children[2] instanceof TerminalNode
-        && context.children[6].children[0].children[1].children
-        && context.children[6].children[0].children[1].children.length===1
-        && context.children[6].children[0].children[1].children[0] instanceof BlockItemContext
-        && context.children[6].children[0].children[1].children[0].children
-        && context.children[6].children[0].children[1].children[0].children.length===1
-        && context.children[6].children[0].children[1].children[0].children[0] instanceof StatementContext
-        && context.children[6].children[0].children[1].children[0].children[0].children
-        && context.children[6].children[0].children[1].children[0].children[0].children.length===1
-        && context.children[6].children[0].children[1].children[0].children[0].children[0] instanceof SelectionStatementContext
-      )
-        console.log(get(context, "children[6].children[0].children[1].children[0].children[0].children[0]"));
-      */
     }
 
     return this.visitChildren(context);
@@ -445,6 +432,19 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       this.addBlock("not", params, [out]);
       return out;
     }
+    if(context.children
+      && context.children.length===2
+      && context.children[0] instanceof UnaryOperatorContext
+      && context.children[0].children
+      && context.children[0].children.length===1
+      && context.children[0].children[0] instanceof TerminalNode
+      && context.children[0].children[0]._symbol.type === CLexer.Minus
+    ) {
+      const out = this.id();
+      const params = [this.visit(context.children[1])];
+      this.addBlock("gain", params, [out], "-1");
+      return out;
+    }
     /*if(context.children
       && context.children.length>1) {
         console.log("unary: " + context.text);
@@ -452,8 +452,26 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     return this.visitChildren(context);
   }
 
+  visitUnaryOperator(context: UnaryOperatorContext) : string {
+    return this.visitChildren(context);
+  }
+
   visitIterationStatement(context: IterationStatementContext) : string {
     console.log("Iterations are not evaluated!");
     return "";
+  }
+
+  visitPrimaryExpression(context: PrimaryExpressionContext) : string {
+    // Do not return terminal nodes!
+    if(context.children
+      && context.children.length===3
+      && context.children[0] instanceof TerminalNode
+      && context.children[2] instanceof TerminalNode
+      && context.children[0]._symbol.type === CLexer.LeftParen
+      && context.children[2]._symbol.type === CLexer.RightParen
+      ) {
+      return this.visit(context.children[1]);
+    }
+    return this.visitChildren(context);
   }
 }
