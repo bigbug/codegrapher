@@ -19,6 +19,12 @@ test("a=2+b;", () => {
     expect(res).toMatchSnapshot();
 });
 
+test("a=(b*c)-h;", () => {
+    const res = getDigraph("a=(b*c)-h;");
+    expect(res).toContain("c");
+    //expect(res).toMatchSnapshot();
+})
+
 test("a=2+(b);", () => {
     const res = getDigraph("a=2+(b);");
     expect(res).toMatchSnapshot();

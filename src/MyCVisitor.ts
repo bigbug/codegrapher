@@ -3,7 +3,7 @@ import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { assign, cond, get, isString } from 'lodash';
 import { CLexer } from './grammars/c/CLexer';
-import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext, IterationStatementContext, ShiftExpressionContext  } from './grammars/c/CParser';
+import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext, IterationStatementContext, ShiftExpressionContext, CastExpressionContext  } from './grammars/c/CParser';
 import {CVisitor} from './grammars/c/CVisitor'
 import { Block, BlockType } from './types';
 import { v4 as uuidv4 } from 'uuid';
@@ -14,6 +14,8 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
 
   public vars : {[variable: string]: string} = {};
   public blocks: Block[] = [];
+
+  public varHistory : {[variable: string] : string} = {};
 
   /*private addOperation(variable: string) : {
     pre: string,
@@ -44,6 +46,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
   }
 
   private setVariable(v: string, newValue:string) : void {
+    this.varHistory[newValue] = v;
     this.vars[v] = newValue;
   }
 

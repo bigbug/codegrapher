@@ -75,8 +75,9 @@ export default function getDigraph(input: string) : string {
         const nodeid = i.type + "_" + idx;
 
         i.inputs.forEach(j=>{
+            const label = v.varHistory[j] ? " [label=\""+v.varHistory[j]+"\"]" : "";
             const z = outputs[j];
-            a+= z + " -> " + nodeid + "\n";
+            a+= z + " -> " + nodeid + label + "\n";
         });
 
         /*i.outputs.forEach(j => {
