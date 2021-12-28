@@ -23,7 +23,7 @@ test("a=2+b;", () => {
 test("a=(b*c)-h;", () => {
     const res = getDigraph("a=(b*c)-h;");
     expect(res).toContain("c");
-    //expect(res).toMatchSnapshot();
+    expect(res).toMatchSnapshot();
 })
 
 test("a=2+(b);", () => {

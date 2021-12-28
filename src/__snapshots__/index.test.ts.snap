@@ -10,6 +10,22 @@ var_0 -> not_1
 }"
 `;
 
+exports[`a=(b*c)-h; 1`] = `
+"digraph {
+node [shape=box style=filled]
+graph [rankdir=\\"LR\\"]
+var_0 [label=\\"b\\"]
+var_1 [label=\\"c\\"]
+multiply_2 [label=\\"*\\\\n*\\"]
+var_3 [label=\\"h\\"]
+sum_4 [label=\\"+\\\\n-\\"]
+var_0 -> multiply_2
+var_1 -> multiply_2
+multiply_2 -> sum_4
+var_3 -> sum_4
+}"
+`;
+
 exports[`a=2+(b); 1`] = `
 "digraph {
 node [shape=box style=filled]
