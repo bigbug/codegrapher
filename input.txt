@@ -1,1 +1,1 @@
-int a, b, c=1;int d;
+int a=2;if(b>0) {a=3;c=4;}

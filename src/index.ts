@@ -1,12 +1,13 @@
-import { ANTLRInputStream, CommonTokenStream } from 'antlr4ts';
+import { CharStreams, CommonTokenStream } from 'antlr4ts';
 import { forEach } from 'lodash';
 import {CLexer} from "./grammars/c/CLexer";
-import {BlockItemListContext, CompilationUnitContext, CParser} from "./grammars/c/CParser";
+import {BlockItemListContext, CParser} from "./grammars/c/CParser";
 import { MyCVisitor } from './MyCVisitor';
 
 export function toTree(input: string) : BlockItemListContext {
     // Create the lexer and parser
-    const inputStream = new ANTLRInputStream(input);
+    const inputStream = CharStreams.fromString(input);
+    //const inputStream = new ANTLRInputStream(input);
     const lexer = new CLexer(inputStream);
     const tokenStream = new CommonTokenStream(lexer);
     const parser = new CParser(tokenStream);
@@ -27,9 +28,7 @@ export function visit(input: string) {
     return v;
 }
 
-export default function getDigraph(input: string) : string {
-    const v = visit(input);
-
+export function generateDigraph(v: MyCVisitor) : string {
     const outputs : {[key: string] : string} = {};
     let a = "digraph {\nnode [shape=box style=filled]\ngraph [rankdir=\"LR\"]\n";
     a += v.blocks.map((i, idx)=>{
@@ -91,4 +90,9 @@ export default function getDigraph(input: string) : string {
 
     a+= "}";
     return a;
+}
+
+export default function getDigraph(input: string) : string {
+    const v = visit(input);
+    return generateDigraph(v);    
 }

@@ -3,7 +3,7 @@ import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { assign, cond, get, isString } from 'lodash';
 import { CLexer } from './grammars/c/CLexer';
-import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext, IterationStatementContext, ShiftExpressionContext, CastExpressionContext, DirectDeclaratorContext, TypedefNameContext  } from './grammars/c/CParser';
+import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext, IterationStatementContext, ShiftExpressionContext, CastExpressionContext, DirectDeclaratorContext, TypedefNameContext, DeclarationSpecifiersContext  } from './grammars/c/CParser';
 import {CVisitor} from './grammars/c/CVisitor'
 import { Block, BlockType } from './types';
 import { v4 as uuidv4 } from 'uuid';
@@ -355,6 +355,22 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       return "";
     }
 
+    // B
+    let blockItemList : BlockItemListContext | undefined;
+    if(context
+      && context.children
+      && context.children.length >= 4
+      && context.children[4] instanceof StatementContext
+      && context.children[4].children
+      && context.children[4].children.length === 1
+      && context.children[4].children[0] instanceof CompoundStatementContext
+      && context.children[4].children[0].children
+      && context.children[4].children[0].children.length === 3
+      && context.children[4].children[0].children[1] instanceof BlockItemListContext
+    ) {
+      blockItemList = context.children[4].children[0].children[1];
+    }
+
     // single expression: assignment Var if
     const assignmentVarIf = get(context, "children[4].children[0].children[1].children[0].children[0].children[0].children[0].children[0].children[0].children[0].text");
     const ifStatementChildren = get(context, "children[4].children[0].children[1].children[0].children");
@@ -369,6 +385,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       && assignmentVarIf === assignmentVarElse
       && ifStatementsOne
       && elseStatementsOne
+      && blockItemList?.childCount === 1
     ) {
       const ifExpr = ifStatementChildren[0].children[0].children[0].children[0].children[2];
       const elseExpr = elseStatementChildren[0].children[0].children[0].children[0].children[2];
@@ -384,7 +401,12 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       return out;
     }
 
-    if(assignmentVarIf && ifStatementsOne) {
+
+    if(assignmentVarIf
+      && ifStatementsOne
+      && blockItemList?.childCount === 1
+    ) {
+      //console.log(ifStatementChildren);
       const ifExpr = ifStatementChildren[0].children[0].children[0].children[0].children[2];
       const out = this.id();
       const params = [this.visit(ifExpr), this.visit(condition), this.useVariable(assignmentVarIf)];
@@ -393,9 +415,10 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       return out;
     }
 
-    if(assignmentVarIf) {
-      //console.log("unresolved if");
+    console.log(blockItemList?.text);
 
+    /*
+    if(assignmentVarIf) {
       const ms = this.visitMultiSwitch(leftVar, assignmentVarIf, context);
       
       if(ms) {
@@ -405,7 +428,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
         this.addBlock("multiswitch", params, [out], ms.map(i=>i.condition).join("\n"));
         return out;
       }
-    }
+    }*/
 
     return this.visitChildren(context);
   }
@@ -486,6 +509,11 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
   }
   visitDirectDeclarator(context: DirectDeclaratorContext) : string {
     this.declarations[this.declarations.length-1].push(context.text);
+    return this.visitChildren(context);
+  }
+
+  visitDeclarationSpecifiers (context: DeclarationSpecifiersContext) : string {
+    const typeOfDeclaration = context.children?.splice(0, context.children.length-1);
     return this.visitChildren(context);
   }
 }
