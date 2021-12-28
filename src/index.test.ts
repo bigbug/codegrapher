@@ -1,4 +1,4 @@
-import getDigraph from ".";
+import getDigraph, { visit } from ".";
 const fs = require('fs');
 
 //const input = 'if(b<0) {\nb=-b;\n}\nb=2+b;\nif(a>1&&a<10&&a==2) {b=10;} else {b=a;} b=b * 2;c=a-b;';
@@ -8,7 +8,7 @@ const fs = require('fs');
 
 let input = "";
 try {
-    input = fs.readFileSync("source.c", "utf-8");
+    input = fs.readFileSync("input.txt", "utf-8");
 } catch (err) {
     console.error(err);
     input = "a=b+c;"
@@ -61,3 +61,11 @@ test("arbitrary input", () => {
         console.error(err)
       }
 });
+
+test("Declarations", () => {
+    const res = visit("int a, b, c=1;int d;");
+    expect(res.declarations[0]).toContain("a");
+    expect(res.declarations[0]).toContain("b");
+    expect(res.declarations[0]).toContain("c");
+    expect(res.declarations[0]).toContain("d");
+})
