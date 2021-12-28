@@ -233,7 +233,7 @@ structDeclaration
     ;
 
 specifierQualifierList
-    :   (typeSpecifier| typeQualifier) specifierQualifierList?
+    :   (typeSpecifier| typeQualifier)
     ;
 
 structDeclaratorList

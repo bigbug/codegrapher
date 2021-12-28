@@ -8,6 +8,16 @@
             "runtimeArgs": ["--inspect-brk", "${workspaceRoot}/node_modules/.bin/jest", "--runInBand", "--coverage", "false"],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "name": "Debug ANTLR4 grammar",
+            "type": "antlr-debug",
+            "request": "launch",
+            "input": "input.txt",
+            "grammar": "src/grammars/c/C.g4",
+            "startRule": "blockItemList",
+            "printParseTree": true,
+            "visualParseTree": true
         }
     ]
 }

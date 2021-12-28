@@ -11,6 +11,7 @@ try {
     input = fs.readFileSync("source.c", "utf-8");
 } catch (err) {
     console.error(err);
+    input = "a=b+c;"
 }
 
 

@@ -10,18 +10,6 @@ var_0 -> not_1
 }"
 `;
 
-exports[`a=(b*c)-h; 1`] = `
-"digraph {
-node [shape=box style=filled]
-graph [rankdir=\\"LR\\"]
-const_0 [label=\\"2\\"]
-var_1 [label=\\"b\\"]
-sum_2 [label=\\"+\\\\n+\\"]
-const_0 -> sum_2
-var_1 -> sum_2
-}"
-`;
-
 exports[`a=2+(b); 1`] = `
 "digraph {
 node [shape=box style=filled]
