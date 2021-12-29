@@ -16,7 +16,7 @@ export function toTree(input: string) : BlockItemListContext {
     return tree;
 }
 
-export function visit(input: string) {
+export function visit(input: string) : MyCVisitor {
     const v = new MyCVisitor();
     const t = toTree(input);
     v.visit(t);
