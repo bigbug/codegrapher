@@ -7,7 +7,6 @@ import { Scope } from './types';
 export function toTree(input: string) : BlockItemListContext {
     // Create the lexer and parser
     const inputStream = CharStreams.fromString(input);
-    //const inputStream = new ANTLRInputStream(input);
     const lexer = new CLexer(inputStream);
     const tokenStream = new CommonTokenStream(lexer);
     const parser = new CParser(tokenStream);
