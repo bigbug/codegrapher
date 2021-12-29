@@ -1,5 +1,5 @@
 import getDigraph, { visit } from ".";
-const fs = require('fs');
+import fs = require('fs');
 
 //const input = 'if(b<0) {\nb=-b;\n}\nb=2+b;\nif(a>1&&a<10&&a==2) {b=10;} else {b=a;} b=b * 2;c=a-b;';
 //const input = 'int a = a+2;';

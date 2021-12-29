@@ -1,44 +1,76 @@
-import { Parser, ParserRuleContext } from 'antlr4ts';
+import { ParserRuleContext } from 'antlr4ts';
 import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor'
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
-import { assign, cond, get, isString } from 'lodash';
+import { get, isString } from 'lodash';
 import { CLexer } from './grammars/c/CLexer';
-import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext, IterationStatementContext, ShiftExpressionContext, CastExpressionContext, DirectDeclaratorContext, TypedefNameContext, DeclarationSpecifiersContext  } from './grammars/c/CParser';
+import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext, IterationStatementContext, ShiftExpressionContext, DirectDeclaratorContext, TypedefNameContext, DeclarationSpecifiersContext  } from './grammars/c/CParser';
 import {CVisitor} from './grammars/c/CVisitor'
-import { Block, BlockType } from './types';
-import { v4 as uuidv4 } from 'uuid';
+import { Block, BlockType, Scope, ScopeType } from './types';
+//import { v4 as uuidv4 } from 'uuid';
 import { ParseTree } from 'antlr4ts/tree/ParseTree';
+
+let idCounter = 1;
 
 // Extend the AbstractParseTreeVisitor to get default visitor behaviour
 export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVisitor<string> {
 
   public vars : {[variable: string]: string} = {};
   public blocks: Block[] = [];
-
   public varHistory : {[variable: string] : string} = {};
-
   public declarations : string[][] = [[]];
+  public scopes: Scope[] = [];
 
-  /*private addOperation(variable: string) : {
-    pre: string,
-    post: string,
-  } {
-    if(!this.vars[variable]) {
-      this.vars[variable] = 0;
-    }
-    this.vars[variable]+=1;
-    return {
-      pre: variable+"|"+(this.vars[variable]-1),
-      post: variable+"|"+this.vars[variable]
-    }
-  }*/
+  constructor() {
+    super();
+    this.pushScope("main", "main");
+  }
+
+  defaultResult() : string {
+    return "";
+  }
+
+  id(): string {
+    return "n"+ (idCounter++);
+  }
+
+  private pushScope(name: string, type: ScopeType) {
+    this.scopes.push({
+      blocks: [],
+      declarations: {},
+      name: name,
+      type: type,
+      subscopes: [],
+      variables: {},
+    });
+  }
 
   private useVariable(v: string) : string {
-    if(!this.vars[v]) {
+    for(let i = this.scopes.length-1; i>=0; i--) {
+      if(this.scopes[i].variables[v]) {
+        return this.scopes[i].variables[v];
+      }
+    }
+
+    this.scopes[0].variables[v] = this.id();
+    this.scopes[0].blocks.push({
+      type: "var",
+      inputs: [],
+      outputs: [this.scopes[0].variables[v]],
+      configuration: v,
+      id: this.scopes[0].variables[v],
+    });
+    return this.scopes[0].variables[v];
+
+    /*if(!this.vars[v]) {
       this.vars[v] = this.id();
       this.addBlock("var", [], [this.vars[v]], v);
     }
-    return this.vars[v];
+    return this.vars[v];*/
+  }
+
+  private setVariable(v: string, newValue:string) : void {
+    this.varHistory[newValue] = v;
+    this.vars[v] = newValue;
   }
 
   private useConstant(v: string) : string {
@@ -47,26 +79,17 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     return id;
   }
 
-  private setVariable(v: string, newValue:string) : void {
-    this.varHistory[newValue] = v;
-    this.vars[v] = newValue;
-  }
-
-  defaultResult() : string {
-    return "";
-  }
-
-  id(): string {
-    return uuidv4();
-  }
-
   private addBlock(type: BlockType, inputs: string[] = [], outputs: string[] = [], configuration: string|string[] = []) : void {
-    this.blocks.push({
+
+    const block = {
       type,
       inputs,
       outputs,
-      configuration
-    });
+      configuration,
+      id: outputs.length>=1 ? outputs[0] : this.id(),
+    };
+    this.scopes[this.scopes.length-1].blocks.push(block);
+    //this.blocks.push(block);
   }
 
   visitAssignmentExpression(context: AssignmentExpressionContext) : string {
@@ -97,12 +120,6 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     }
     return this.visitChildren(context);
   }
-
-  /*visitBlockItem(context: BlockItemContext) {
-    console.log(context.text);
-    this.visitChildren(context);
-    return [];
-  }*/
 
   visitAdditiveExpression(context: AdditiveExpressionContext) : string {
     if(context.children
@@ -204,10 +221,6 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       const out = this.id();
       this.addBlock("function", argResults, [out], functionName);
       return out;
-      //console.log(functionName);
-      //console.log(args.map((i:ParserRuleContext)=>i.text));
-      /*const argRes = args.map((i:ParserRuleContext)=>this.visit(i));
-      return [];*/
     }
     
     // Variable
@@ -240,12 +253,6 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     return this.visitChildren(context);
     //return "";
   }
-
-  /*visitMultiportSwitch(context: SelectionStatementContext, variable: string) {
-    const assignmentVarIf = get(context, "children[4].children[0].children[1].children[0].children[0].children[0].children[0].children[0].children[0].children[0].text");
-    const ifStatementChildren = get(context, "children[4].children[0].children[1].children[0].children");
-
-  }*/
 
   visitMultiSwitch(conditionVariable: string, assignmentVar: string, context: SelectionStatementContext) : {
     condition: string,
@@ -295,11 +302,6 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       && elseStatementsOne
     ) {
       const elseExpr = elseStatementChildren[0].children[0].children[0].children[0].children[2];
-      //console.log("switch");
-      //console.log(condition.text);
-      //this.visitChildren(condition);
-      //console.log(ifExpr.text);
-      //console.log(elseExpr.text);
       res = [...res, {
         condition: "*",
         value: elseExpr
@@ -389,11 +391,6 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     ) {
       const ifExpr = ifStatementChildren[0].children[0].children[0].children[0].children[2];
       const elseExpr = elseStatementChildren[0].children[0].children[0].children[0].children[2];
-      //console.log("switch");
-      //console.log(condition.text);
-      //this.visitChildren(condition);
-      //console.log(ifExpr.text);
-      //console.log(elseExpr.text);
       const out = this.id();
       const params = [this.visit(ifExpr), this.visit(condition), this.visit(elseExpr)];
       this.setVariable(assignmentVarIf, out);
@@ -406,7 +403,6 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       && ifStatementsOne
       && blockItemList?.childCount === 1
     ) {
-      //console.log(ifStatementChildren);
       const ifExpr = ifStatementChildren[0].children[0].children[0].children[0].children[2];
       const out = this.id();
       const params = [this.visit(ifExpr), this.visit(condition), this.useVariable(assignmentVarIf)];
@@ -473,10 +469,6 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       this.addBlock("gain", params, [out], "-1");
       return out;
     }
-    /*if(context.children
-      && context.children.length>1) {
-        console.log("unary: " + context.text);
-      }*/
     return this.visitChildren(context);
   }
 
