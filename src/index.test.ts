@@ -1,4 +1,4 @@
-import getDigraph, { visit } from ".";
+import getDigraph, { generateDigraph, visit } from ".";
 import fs = require('fs');
 
 //const input = 'if(b<0) {\nb=-b;\n}\nb=2+b;\nif(a>1&&a<10&&a==2) {b=10;} else {b=a;} b=b * 2;c=a-b;';
@@ -80,7 +80,8 @@ test("Declarations 2", () => {
     expect(res.scopes[0].declarations["f"].type).toEqual("static volatile abc");
 })
 
-/*test("ABC", () => {
-    const res = visit("int a=2;if(b>0) {a=3;c=4;b=a+c;}");
+test("if pipe with scope", () => {
+    const res = visit("int a=2;a = a+1;if(a==2) {int c=1;a=3;if(a==3) {c=2;a=2;}b=a+c;}");
     expect(res.scopes[0].subscopes.length).toEqual(1);
-})*/
+    expect(generateDigraph(res)).toMatchSnapshot();
+})

@@ -72,6 +72,54 @@ node_n41 -> node_n35
 }"
 `;
 
+exports[`if pipe with scope 1`] = `
+"digraph {
+node [shape=box style=filled]
+graph [rankdir=\\"LR\\"]
+node_n68 [label=\\"2\\"]
+node_n69 [label=\\"1\\"]
+node_n70 [label=\\"+\\\\n+\\"]
+node_n72 [label=\\"2\\"]
+node_n71 [label=\\"==\\"]
+node_n86 [label=\\"pipe\\"]
+node_n88 [label=\\"b\\"]
+node_n87 [label=\\"pipe\\"]
+subgraph cluster_n73 {node_n74 [label=\\"1\\"]
+node_n75 [label=\\"3\\"]
+node_n77 [label=\\"3\\"]
+node_n76 [label=\\"==\\"]
+node_n82 [label=\\"pipe\\"]
+node_n83 [label=\\"pipe\\"]
+node_n84 [label=\\"+\\\\n+\\"]
+node_n85 [label=\\"act\\" color=green]
+subgraph cluster_n78 {node_n79 [label=\\"2\\"]
+node_n80 [label=\\"2\\"]
+node_n81 [label=\\"act\\" color=green]
+node_n76 -> node_n81
+}node_n75 -> node_n76
+node_n77 -> node_n76
+node_n81 -> node_n82
+node_n74 -> node_n82
+node_n79 -> node_n82
+node_n81 -> node_n83
+node_n75 -> node_n83
+node_n80 -> node_n83
+node_n83 -> node_n84
+node_n82 -> node_n84
+node_n71 -> node_n85
+}node_n68 -> node_n70
+node_n69 -> node_n70
+node_n70 -> node_n71
+node_n72 -> node_n71
+node_n85 -> node_n86
+node_n70 -> node_n86
+node_n83 -> node_n86
+node_n85 -> node_n87
+node_n88 -> node_n87
+node_n84 -> node_n87
+}"
+`;
+
 exports[`if(b==2) {a=2;} else {if(b==1) {a=1;} else {a=0;}} 1`] = `
 "digraph {
 node [shape=box style=filled]
