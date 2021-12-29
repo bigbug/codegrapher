@@ -80,7 +80,7 @@ test("Declarations 2", () => {
     expect(res.scopes[0].declarations["f"].type).toEqual("static volatile abc");
 })
 
-test("ABC", () => {
+/*test("ABC", () => {
     const res = visit("int a=2;if(b>0) {a=3;c=4;b=a+c;}");
     expect(res.scopes[0].subscopes.length).toEqual(1);
-})
+})*/

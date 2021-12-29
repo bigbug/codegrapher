@@ -57,6 +57,8 @@ export function generateScope(scope: Scope) : string {
             return nodeid + " [label=\"1\\ncond\\n2\"]"
         } else if (["multiswitch"].includes(i.type)) {
             return nodeid + " [label=\"cond\\n"+i.configuration+"\"]"
+        } else if (["ifmultiplex"].includes(i.type)) {
+            return nodeid + " [label=\"pipe\"]"
         } else {
             throw new Error("Unsupported node of type '"+i.type+"'");
         }

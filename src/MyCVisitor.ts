@@ -65,13 +65,13 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
   }
 
   private setVariable(v: string, newValue:string) : void {
-    for(let i = this.scopes.length-1; i>=0; i--) {
+    this.scopes[this.scopes.length-1].variables[v] = newValue;
+    /*for(let i = this.scopes.length-1; i>=0; i--) {
       if(this.scopes[i].declarations[v]) {
         this.scopes[i].variables[v] = newValue;
         return;
       }
-    }
-    this.scopes[0].variables[v] = newValue;
+    }*/
   }
 
   private useConstant(v: string) : string {
@@ -80,7 +80,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     return id;
   }
 
-  private addBlock(type: BlockType, inputs: string[] = [], outputs: string[] = [], configuration: string|string[] = []) : void {
+  private addBlock(type: BlockType, inputs: string[] = [], outputs: string[] = [], configuration: string|string[] = []) : string {
 
     const block : Block = {
       type,
@@ -90,7 +90,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       id: outputs.length>=1 ? outputs[0] : this.id(),
     };
     this.scopes[this.scopes.length-1].blocks.push(block);
-    //this.blocks.push(block);
+    return block.id;
   }
 
   visitAssignmentExpression(context: AssignmentExpressionContext) : string {
@@ -429,12 +429,19 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       const cond = this.visit(condition);
       this.visit(blockItemList);
       const subscope : Scope = this.scopes[this.scopes.length-1].subscopes[this.scopes[this.scopes.length-1].subscopes.length-1];
+      const activationId = this.id();
       subscope.blocks.push({
         type: "activation",
         configuration: [],
         inputs: [cond],
         outputs: [],
-        id: this.id()
+        id: activationId,
+      });
+      const multiplexVars = Object.keys(subscope.variables).filter(variable => !subscope.declarations[variable]);
+      multiplexVars.forEach(variable => {
+        const output = this.id();
+        this.addBlock("ifmultiplex", [activationId, this.useVariable(variable), subscope.variables[variable]], [output]);
+        this.setVariable(variable, output);
       });
       return "";
     }
