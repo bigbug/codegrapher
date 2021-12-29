@@ -2,15 +2,34 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Jest Tests",
+            "name": "Debug Tests",
             "type": "node",
             "request": "launch",
-            "runtimeArgs": ["--inspect-brk", "${workspaceRoot}/node_modules/.bin/jest", "--runInBand", "--coverage", "false"],
+            "runtimeArgs": [
+              "--inspect-brk",
+              "${workspaceRoot}/node_modules/.bin/jest",
+              "--runInBand",
+              "--config",
+              "jestconfig.json",
+              "--coverage",
+              "false"
+            ],
             "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen"
+            "internalConsoleOptions": "neverOpen",
+            "port": 9229
+          },
+        {
+            "name": "Debug ANTLR CompilationUnoit",
+            "type": "antlr-debug",
+            "request": "launch",
+            "input": "input.txt",
+            "grammar": "src/grammars/c/C.g4",
+            "startRule": "compilationUnit",
+            "printParseTree": true,
+            "visualParseTree": true
         },
         {
-            "name": "Debug ANTLR4 grammar",
+            "name": "Debug ANTLR4 BlockItemList",
             "type": "antlr-debug",
             "request": "launch",
             "input": "input.txt",
