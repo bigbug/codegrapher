@@ -65,14 +65,19 @@ test("arbitrary input", () => {
 test("Declarations 1", () => {
     const res = visit("int d;");
     expect(res.scopes[0].declarations["d"]).toBeDefined();
+    expect(res.scopes[0].declarations["d"].type).toEqual("int");
 })
 
 test("Declarations 2", () => {
-    const res = visit("int a, b, c=1;int d;");
+    const res = visit("int a, b, c=1;int d;string e;static volatile abc f;");
     expect(res.scopes[0].declarations["a"]).toBeDefined();
     expect(res.scopes[0].declarations["b"]).toBeDefined();
     expect(res.scopes[0].declarations["c"]).toBeDefined();
     expect(res.scopes[0].declarations["d"]).toBeDefined();
+    expect(res.scopes[0].declarations["e"]).toBeDefined();
+    expect(res.scopes[0].declarations["e"].type).toEqual("string");
+    expect(res.scopes[0].declarations["f"]).toBeDefined();
+    expect(res.scopes[0].declarations["f"].type).toEqual("static volatile abc");
 })
 
 test("ABC", () => {

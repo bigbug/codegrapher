@@ -14,6 +14,7 @@ let idCounter = 1;
 // Extend the AbstractParseTreeVisitor to get default visitor behaviour
 export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVisitor<string> {
   public scopes: Scope[] = [];
+  private currentDeclarationType = "";
 
   constructor() {
     super();
@@ -81,7 +82,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
 
   private addBlock(type: BlockType, inputs: string[] = [], outputs: string[] = [], configuration: string|string[] = []) : void {
 
-    const block = {
+    const block : Block = {
       type,
       inputs,
       outputs,
@@ -477,7 +478,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
   }
 
   visitIterationStatement(context: IterationStatementContext) : string {
-    console.log("Iterations are not evaluated!");
+    console.log("Iterations are not evaluated!:" + context.text);
     return "";
   }
 
@@ -496,16 +497,17 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
   }
 
   visitTypedefName(context: TypedefNameContext) : string {
-    this.scopes[this.scopes.length-1].declarations[context.text] = {type: ""};
+    this.scopes[this.scopes.length-1].declarations[context.text] = {type: this.currentDeclarationType};
     return this.visitChildren(context);
   }
   visitDirectDeclarator(context: DirectDeclaratorContext) : string {
-    this.scopes[this.scopes.length-1].declarations[context.text] = {type: ""};
+    this.scopes[this.scopes.length-1].declarations[context.text] = {type: this.currentDeclarationType};
     return this.visitChildren(context);
   }
 
   visitDeclarationSpecifiers (context: DeclarationSpecifiersContext) : string {
     const typeOfDeclaration = context.children?.splice(0, context.children.length-1);
+    this.currentDeclarationType = typeOfDeclaration?.map(i=>i.text).join(" ") || "";
     return this.visitChildren(context);
   }
 }
