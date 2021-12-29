@@ -1,4 +1,4 @@
-export type BlockType = "shift"|"gain"|"sum"|"product"|"function"|"abs"|"var"|"and"|"or"|"relational"|"const"|"switch"|"multiply"|"not"|"multiswitch"|"if"|"activation"|"ifmultiplex"|"param";
+export type BlockType = "shift"|"gain"|"sum"|"product"|"function"|"abs"|"var"|"and"|"or"|"relational"|"const"|"switch"|"multiply"|"not"|"multiswitch"|"if"|"activation"|"ifmultiplex"|"param"|"return";
 
 export type ScopeType = "main"|"if"|"function";
 
@@ -23,6 +23,7 @@ export type Scope = {
     type: ScopeType,
     name: string,
     subscopes: Scope[],
+    dataStorage?: {returns: string[]}
 }
 
 export type VisitorState = "normal" | "function";

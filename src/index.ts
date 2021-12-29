@@ -51,6 +51,8 @@ export function generateScope(scope: Scope) : string {
             return nodeid + " [label=\""+i.configuration+"\"]"
         } else if(["param"].includes(i.type)) {
             return nodeid + " [label=\""+i.configuration+"\" color=orange]"
+        } else if(["return"].includes(i.type)) {
+            return nodeid + " [label=\"return\" color=orange]"
         } else if(["function"].includes(i.type)) {
             return nodeid + " [label=\""+i.configuration+"\" color=green]"
         } else if(["activation"].includes(i.type)) {

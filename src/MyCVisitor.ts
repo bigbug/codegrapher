@@ -3,7 +3,7 @@ import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { get, isString } from 'lodash';
 import { CLexer } from './grammars/c/CLexer';
-import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext, IterationStatementContext, ShiftExpressionContext, DirectDeclaratorContext, TypedefNameContext, DeclarationSpecifiersContext, InitDeclaratorContext, FunctionDefinitionContext, CompilationUnitContext, ParameterDeclarationContext, TypeSpecifierContext  } from './grammars/c/CParser';
+import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext, IterationStatementContext, ShiftExpressionContext, DirectDeclaratorContext, TypedefNameContext, DeclarationSpecifiersContext, InitDeclaratorContext, FunctionDefinitionContext, CompilationUnitContext, ParameterDeclarationContext, TypeSpecifierContext, JumpStatementContext  } from './grammars/c/CParser';
 import {CVisitor} from './grammars/c/CVisitor'
 import { Block, BlockType, Scope, ScopeType, VisitorState } from './types';
 //import { v4 as uuidv4 } from 'uuid';
@@ -584,8 +584,33 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     this.visitChildren(ctx);
     const functionScope:Scope = this.scopes.pop() as Scope;
     this.scopes[this.scopes.length-1].subscopes.push(functionScope);
+    
+    const returns = functionScope.dataStorage?.returns;
+    if(returns && returns.length>=1) {
+      functionScope.blocks.push({
+        configuration: [],
+        type: "return",
+        id: this.id(),
+        inputs: returns,
+        outputs: [],
+      })
+    }
+
     return "";
   }
 
-  
+  visitJumpStatement(ctx: JumpStatementContext) : string {
+    if(ctx.children
+      && ctx.children.length===3
+      && ctx.children[0] instanceof TerminalNode
+      && ctx.children[0].text === "return") {
+        if(!this.scopes[this.scopes.length-1].dataStorage) {
+          this.scopes[this.scopes.length-1].dataStorage = {
+            returns: []
+          }
+        }
+        this.scopes[this.scopes.length-1].dataStorage?.returns.push(this.visit(ctx.children[1]));
+      }
+    return "";
+  }
 }
