@@ -76,8 +76,7 @@ test("if pipe with scope", () => {
 })
 
 test("arbitrary input", () => {
-    const res = getDigraph(input);
-    //console.log(res);
+    const res = getDigraph(input, false);
     try {
         fs.writeFileSync('reverselinktargetresult.dot', res)
         //file written successfully

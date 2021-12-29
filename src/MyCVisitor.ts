@@ -3,22 +3,25 @@ import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { get, isString } from 'lodash';
 import { CLexer } from './grammars/c/CLexer';
-import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext, IterationStatementContext, ShiftExpressionContext, DirectDeclaratorContext, TypedefNameContext, DeclarationSpecifiersContext, InitDeclaratorContext, FunctionDefinitionContext  } from './grammars/c/CParser';
+import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext, IterationStatementContext, ShiftExpressionContext, DirectDeclaratorContext, TypedefNameContext, DeclarationSpecifiersContext, InitDeclaratorContext, FunctionDefinitionContext, CompilationUnitContext, ParameterDeclarationContext, TypeSpecifierContext  } from './grammars/c/CParser';
 import {CVisitor} from './grammars/c/CVisitor'
-import { Block, BlockType, Scope, ScopeType } from './types';
+import { Block, BlockType, Scope, ScopeType, VisitorState } from './types';
 //import { v4 as uuidv4 } from 'uuid';
 import { ParseTree } from 'antlr4ts/tree/ParseTree';
+import { RuleNode } from 'antlr4ts/tree/RuleNode';
 
 
 // Extend the AbstractParseTreeVisitor to get default visitor behaviour
 export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVisitor<string> {
   public scopes: Scope[] = [];
   private currentDeclarationType = "";
+  private visitorState : VisitorState = "normal";
 
   private idCounter = 1;
 
   constructor() {
     super();
+    this.pushScope("main", "main");
   }
 
   defaultResult() : string {
@@ -415,7 +418,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
 
     if(blockItemList) {
       const cond = this.visit(condition);
-      this.visit(blockItemList);
+      this.visitBlockItemList(blockItemList, "if");
       const subscope : Scope = this.scopes[this.scopes.length-1].subscopes[this.scopes[this.scopes.length-1].subscopes.length-1];
       const activationId = this.id();
       subscope.blocks.push({
@@ -504,12 +507,24 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     return this.visitChildren(context);
   }
 
-  visitTypedefName(context: TypedefNameContext) : string {
-    this.scopes[this.scopes.length-1].declarations[context.text] = {type: this.currentDeclarationType};
+  private visitDecl(context: RuleNode) : string {
+    this.scopes[this.scopes.length-1].declarations[context.text] = {type: this.currentDeclarationType, parameter: this.visitorState=="function"};
+    if(this.visitorState=="function") {
+      const id = this.id();
+      this.addBlock("param", [], [id], context.text);
+      this.setVariable(context.text, id);
+    }
     return this.visitChildren(context);
   }
+
+  visitTypedefName(context: TypedefNameContext) : string {
+    return this.visitDecl(context);
+  }
   visitDirectDeclarator(context: DirectDeclaratorContext) : string {
-    this.scopes[this.scopes.length-1].declarations[context.text] = {type: this.currentDeclarationType};
+    if(context.children
+      && context.children.length===1
+      && context.children[0] instanceof TerminalNode)
+      return this.visitDecl(context);
     return this.visitChildren(context);
   }
 
@@ -519,8 +534,22 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     return this.visitChildren(context);
   }
 
-  visitBlockItemList(ctx: BlockItemListContext) : string {
-    this.pushScope("main", "main");
+  visitTypeSpecifier(ctx: TypeSpecifierContext) : string{
+    if(ctx.children
+      && ctx.children.length===1
+      && ctx.children[0] instanceof TerminalNode) {
+        this.currentDeclarationType = ctx.text;
+        return "";
+      }
+    return this.visitChildren(ctx);
+  }
+
+  visitBlockItemList(ctx: BlockItemListContext, type : ScopeType = "main") : string {
+    if(this.visitorState==="function" || (type==="main" && this.scopes[this.scopes.length-1].type==="main")) {
+      this.visitorState = "normal";
+      return this.visitChildren(ctx);
+    }
+    this.pushScope(type, type);
     this.visitChildren(ctx);
 
     if(this.scopes.length>1) {
@@ -541,6 +570,16 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
 
   visitFunctionDefinition(ctx: FunctionDefinitionContext) : string {
     console.log(ctx.text);
-    return this.visitChildren(ctx);
+    this.pushScope("function", "function");
+    this.visitChildren(ctx);
+    const functionScope:Scope = this.scopes.pop() as Scope;
+    this.scopes[this.scopes.length-1].subscopes.push(functionScope);
+    return "";
+  }
+
+  visitParameterDeclaration(ctx: ParameterDeclarationContext) : string{
+    this.visitorState = "function";
+    this.visitChildren(ctx);
+    return "";
   }
 }

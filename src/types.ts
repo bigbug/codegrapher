@@ -1,9 +1,10 @@
-export type BlockType = "shift"|"gain"|"sum"|"product"|"function"|"abs"|"var"|"and"|"or"|"relational"|"const"|"switch"|"multiply"|"not"|"multiswitch"|"if"|"activation"|"ifmultiplex";
+export type BlockType = "shift"|"gain"|"sum"|"product"|"function"|"abs"|"var"|"and"|"or"|"relational"|"const"|"switch"|"multiply"|"not"|"multiswitch"|"if"|"activation"|"ifmultiplex"|"param";
 
 export type ScopeType = "main"|"if"|"function";
 
 export type Declaration = {
     type: string,
+    parameter: boolean,
 }
 
 export type Block = {
@@ -23,3 +24,5 @@ export type Scope = {
     name: string,
     subscopes: Scope[],
 }
+
+export type VisitorState = "normal" | "function";

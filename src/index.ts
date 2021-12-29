@@ -1,10 +1,11 @@
 import { CharStreams, CommonTokenStream } from 'antlr4ts';
+import { ParseTree } from 'antlr4ts/tree/ParseTree';
 import {CLexer} from "./grammars/c/CLexer";
-import {BlockItemListContext, CParser} from "./grammars/c/CParser";
+import {BlockItemListContext, CompilationUnitContext, CParser} from "./grammars/c/CParser";
 import { MyCVisitor } from './MyCVisitor';
-import { Scope } from './types';
+import { Block, Scope } from './types';
 
-export function toTree(input: string) : BlockItemListContext {
+export function toTree(input: string, parts = true) : ParseTree {
     // Create the lexer and parser
     const inputStream = CharStreams.fromString(input);
     const lexer = new CLexer(inputStream);
@@ -12,13 +13,18 @@ export function toTree(input: string) : BlockItemListContext {
     const parser = new CParser(tokenStream);
 
     // Parse the input, where `compilationUnit` is whatever entry point you defined
-    const tree:BlockItemListContext = parser.blockItemList();
-    return tree;
+    if(!parts) {
+        const tree:CompilationUnitContext = parser.compilationUnit();
+        return tree;
+    } else {
+        const tree:BlockItemListContext = parser.blockItemList();
+        return tree;
+    }
 }
 
-export function visit(input: string) : MyCVisitor {
+export function visit(input: string, parts = true) : MyCVisitor {
     const v = new MyCVisitor();
-    const t = toTree(input);
+    const t = toTree(input, parts);
     v.visit(t);
     return v;
 }
@@ -39,6 +45,8 @@ export function generateScope(scope: Scope) : string {
 
         if(["var", "const"].includes(i.type)) {
             return nodeid + " [label=\""+i.configuration+"\"]"
+        } else if(["param"].includes(i.type)) {
+            return nodeid + " [label=\""+i.configuration+"\" color=orange]"
         } else if(["function"].includes(i.type)) {
             return nodeid + " [label=\""+i.configuration+"\" color=green]"
         } else if(["activation"].includes(i.type)) {
@@ -82,7 +90,7 @@ export function generateDigraph(v: MyCVisitor) : string {
     return a;
 }
 
-export default function getDigraph(input: string) : string {
-    const v = visit(input);
+export default function getDigraph(input: string, parts = true) : string {
+    const v = visit(input, parts);
     return generateDigraph(v);    
 }
