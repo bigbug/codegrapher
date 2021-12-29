@@ -1,9 +1,9 @@
-import { NoViableAltException, ParserRuleContext } from 'antlr4ts';
+import { ParserRuleContext } from 'antlr4ts';
 import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor'
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { get, isString } from 'lodash';
 import { CLexer } from './grammars/c/CLexer';
-import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext, IterationStatementContext, ShiftExpressionContext, DirectDeclaratorContext, TypedefNameContext, DeclarationSpecifiersContext  } from './grammars/c/CParser';
+import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext, IterationStatementContext, ShiftExpressionContext, DirectDeclaratorContext, TypedefNameContext, DeclarationSpecifiersContext, InitDeclaratorContext  } from './grammars/c/CParser';
 import {CVisitor} from './grammars/c/CVisitor'
 import { Block, BlockType, Scope, ScopeType } from './types';
 //import { v4 as uuidv4 } from 'uuid';
@@ -541,5 +541,14 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       this.scopes[this.scopes.length-1].subscopes.push(oldScope);
     }
     return "";
+  }
+
+  visitInitDeclarator(ctx: InitDeclaratorContext) : string {
+    if(ctx.children?.length===3) {
+      this.visit(ctx.children[0]);
+      this.setVariable(ctx.children[0].text, this.visit(ctx.children[2]));
+      return "";
+    }
+    return this.visitChildren(ctx);
   }
 }
