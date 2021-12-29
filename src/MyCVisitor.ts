@@ -56,22 +56,10 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       id: this.scopes[0].variables[v],
     });
     return this.scopes[0].variables[v];
-
-    /*if(!this.vars[v]) {
-      this.vars[v] = this.id();
-      this.addBlock("var", [], [this.vars[v]], v);
-    }
-    return this.vars[v];*/
   }
 
   private setVariable(v: string, newValue:string) : void {
     this.scopes[this.scopes.length-1].variables[v] = newValue;
-    /*for(let i = this.scopes.length-1; i>=0; i--) {
-      if(this.scopes[i].declarations[v]) {
-        this.scopes[i].variables[v] = newValue;
-        return;
-      }
-    }*/
   }
 
   private useConstant(v: string) : string {
