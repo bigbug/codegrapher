@@ -425,7 +425,6 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     }*/
 
     if(blockItemList) {
-      console.log(blockItemList?.text);
       const cond = this.visit(condition);
       this.visit(blockItemList);
       const subscope : Scope = this.scopes[this.scopes.length-1].subscopes[this.scopes[this.scopes.length-1].subscopes.length-1];
@@ -448,7 +447,6 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
 
     console.log("unresolved if");
     return "";
-    //return this.visitChildren(context);
   }
 
   visitShiftExpression(context: ShiftExpressionContext) : string {
