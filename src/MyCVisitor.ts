@@ -21,7 +21,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
 
   constructor() {
     super();
-    this.pushScope("main", "main");
+    this.pushScope("", "main");
   }
 
   defaultResult() : string {
@@ -522,6 +522,15 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
   }
   visitDirectDeclarator(context: DirectDeclaratorContext) : string {
     if(context.children
+      && context.children.length===4
+      && this.visitorState==="function"
+      && context.children[1].text==="("
+      && context.children[3].text===")") {
+        this.scopes[this.scopes.length-1].name += (context.children.splice(0,1) as ParseTree[])[0].text;
+      }
+
+
+    if(context.children
       && context.children.length===1
       && context.children[0] instanceof TerminalNode)
       return this.visitDecl(context);
@@ -549,7 +558,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       this.visitorState = "normal";
       return this.visitChildren(ctx);
     }
-    this.pushScope(type, type);
+    this.pushScope("", type);
     this.visitChildren(ctx);
 
     if(this.scopes.length>1) {
@@ -569,17 +578,14 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
   }
 
   visitFunctionDefinition(ctx: FunctionDefinitionContext) : string {
-    console.log(ctx.text);
-    this.pushScope("function", "function");
+    this.visitorState = "function";
+    const type : ParseTree[] = ctx.children?.splice(0,1) as ParseTree[];
+    this.pushScope("("+type[0].text+")", "function");
     this.visitChildren(ctx);
     const functionScope:Scope = this.scopes.pop() as Scope;
     this.scopes[this.scopes.length-1].subscopes.push(functionScope);
     return "";
   }
 
-  visitParameterDeclaration(ctx: ParameterDeclarationContext) : string{
-    this.visitorState = "function";
-    this.visitChildren(ctx);
-    return "";
-  }
+  
 }
