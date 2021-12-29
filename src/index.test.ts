@@ -64,17 +64,17 @@ test("arbitrary input", () => {
 
 test("Declarations 1", () => {
     const res = visit("int d;");
-    expect(res.declarations[0]).toContain("d");
+    expect(res.scopes[0].declarations["d"]).toBeDefined();
 })
 
 test("Declarations 2", () => {
     const res = visit("int a, b, c=1;int d;");
-    expect(res.declarations[0]).toContain("a");
-    expect(res.declarations[0]).toContain("b");
-    expect(res.declarations[0]).toContain("c");
-    expect(res.declarations[0]).toContain("d");
+    expect(res.scopes[0].declarations["a"]).toBeDefined();
+    expect(res.scopes[0].declarations["b"]).toBeDefined();
+    expect(res.scopes[0].declarations["c"]).toBeDefined();
+    expect(res.scopes[0].declarations["d"]).toBeDefined();
 })
 
 test("ABC", () => {
-    const res = visit("int a=2;if(b>0) {a=3;c=4;}");
+    const res = visit("int a=2;if(b>0) {a=3;c=4;b=a+c;}");
 })

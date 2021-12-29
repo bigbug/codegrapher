@@ -55,21 +55,20 @@ exports[`b=12;if(a==2) {c=b+34;} else {c=5678;} 1`] = `
 node [shape=box style=filled]
 graph [rankdir=\\"LR\\"]
 node_n27 [label=\\"12\\"]
-node_n29 [label=\\"b\\"]
-node_n30 [label=\\"34\\"]
-node_n31 [label=\\"+\\\\n+\\"]
-node_n33 [label=\\"a\\"]
-node_n34 [label=\\"2\\"]
-node_n32 [label=\\"==\\"]
-node_n35 [label=\\"5678\\"]
+node_n29 [label=\\"34\\"]
+node_n30 [label=\\"+\\\\n+\\"]
+node_n32 [label=\\"a\\"]
+node_n33 [label=\\"2\\"]
+node_n31 [label=\\"==\\"]
+node_n34 [label=\\"5678\\"]
 node_n28 [label=\\"1\\\\ncond\\\\n2\\"]
-node_n29 -> node_n31
-node_n30 -> node_n31
-node_n33 -> node_n32
-node_n34 -> node_n32
+node_n27 -> node_n30
+node_n29 -> node_n30
+node_n32 -> node_n31
+node_n33 -> node_n31
+node_n30 -> node_n28
 node_n31 -> node_n28
-node_n32 -> node_n28
-node_n35 -> node_n28
+node_n34 -> node_n28
 }"
 `;
 

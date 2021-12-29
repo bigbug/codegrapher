@@ -13,11 +13,6 @@ let idCounter = 1;
 
 // Extend the AbstractParseTreeVisitor to get default visitor behaviour
 export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVisitor<string> {
-
-  public vars : {[variable: string]: string} = {};
-  public blocks: Block[] = [];
-  public varHistory : {[variable: string] : string} = {};
-  public declarations : string[][] = [[]];
   public scopes: Scope[] = [];
 
   constructor() {
@@ -69,8 +64,13 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
   }
 
   private setVariable(v: string, newValue:string) : void {
-    this.varHistory[newValue] = v;
-    this.vars[v] = newValue;
+    for(let i = this.scopes.length-1; i>=0; i--) {
+      if(this.scopes[i].declarations[v]) {
+        this.scopes[i].variables[v] = newValue;
+        return;
+      }
+    }
+    this.scopes[0].variables[v] = newValue;
   }
 
   private useConstant(v: string) : string {
@@ -496,11 +496,11 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
   }
 
   visitTypedefName(context: TypedefNameContext) : string {
-    this.declarations[this.declarations.length-1].push(context.text);
+    this.scopes[this.scopes.length-1].declarations[context.text] = {type: ""};
     return this.visitChildren(context);
   }
   visitDirectDeclarator(context: DirectDeclaratorContext) : string {
-    this.declarations[this.declarations.length-1].push(context.text);
+    this.scopes[this.scopes.length-1].declarations[context.text] = {type: ""};
     return this.visitChildren(context);
   }
 
