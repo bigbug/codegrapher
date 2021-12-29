@@ -4,9 +4,9 @@ exports[`a=!b; 1`] = `
 "digraph {
 node [shape=box style=filled]
 graph [rankdir=\\"LR\\"]
-node_n20 [label=\\"b\\"]
-node_n19 [label=\\"not\\"]
-node_n20 -> node_n19
+node_n25 [label=\\"b\\"]
+node_n24 [label=\\"not\\"]
+node_n25 -> node_n24
 }"
 `;
 
@@ -14,15 +14,15 @@ exports[`a=(b*c)-h; 1`] = `
 "digraph {
 node [shape=box style=filled]
 graph [rankdir=\\"LR\\"]
-node_n4 [label=\\"b\\"]
-node_n5 [label=\\"c\\"]
-node_n6 [label=\\"*\\\\n*\\"]
-node_n7 [label=\\"h\\"]
-node_n8 [label=\\"+\\\\n-\\"]
-node_n4 -> node_n6
-node_n5 -> node_n6
+node_n6 [label=\\"b\\"]
+node_n7 [label=\\"c\\"]
+node_n8 [label=\\"*\\\\n*\\"]
+node_n9 [label=\\"h\\"]
+node_n10 [label=\\"+\\\\n-\\"]
 node_n6 -> node_n8
 node_n7 -> node_n8
+node_n8 -> node_n10
+node_n9 -> node_n10
 }"
 `;
 
@@ -30,11 +30,11 @@ exports[`a=2+(b); 1`] = `
 "digraph {
 node [shape=box style=filled]
 graph [rankdir=\\"LR\\"]
-node_n9 [label=\\"2\\"]
-node_n10 [label=\\"b\\"]
-node_n11 [label=\\"+\\\\n+\\"]
-node_n9 -> node_n11
-node_n10 -> node_n11
+node_n12 [label=\\"2\\"]
+node_n13 [label=\\"b\\"]
+node_n14 [label=\\"+\\\\n+\\"]
+node_n12 -> node_n14
+node_n13 -> node_n14
 }"
 `;
 
@@ -42,11 +42,11 @@ exports[`a=2+b; 1`] = `
 "digraph {
 node [shape=box style=filled]
 graph [rankdir=\\"LR\\"]
-node_n1 [label=\\"2\\"]
-node_n2 [label=\\"b\\"]
-node_n3 [label=\\"+\\\\n+\\"]
-node_n1 -> node_n3
-node_n2 -> node_n3
+node_n2 [label=\\"2\\"]
+node_n3 [label=\\"b\\"]
+node_n4 [label=\\"+\\\\n+\\"]
+node_n2 -> node_n4
+node_n3 -> node_n4
 }"
 `;
 
@@ -54,21 +54,21 @@ exports[`b=12;if(a==2) {c=b+34;} else {c=5678;} 1`] = `
 "digraph {
 node [shape=box style=filled]
 graph [rankdir=\\"LR\\"]
-node_n27 [label=\\"12\\"]
-node_n29 [label=\\"34\\"]
-node_n30 [label=\\"+\\\\n+\\"]
-node_n32 [label=\\"a\\"]
-node_n33 [label=\\"2\\"]
-node_n31 [label=\\"==\\"]
-node_n34 [label=\\"5678\\"]
-node_n28 [label=\\"1\\\\ncond\\\\n2\\"]
-node_n27 -> node_n30
-node_n29 -> node_n30
-node_n32 -> node_n31
-node_n33 -> node_n31
-node_n30 -> node_n28
-node_n31 -> node_n28
-node_n34 -> node_n28
+node_n34 [label=\\"12\\"]
+node_n36 [label=\\"34\\"]
+node_n37 [label=\\"+\\\\n+\\"]
+node_n39 [label=\\"a\\"]
+node_n40 [label=\\"2\\"]
+node_n38 [label=\\"==\\"]
+node_n41 [label=\\"5678\\"]
+node_n35 [label=\\"1\\\\ncond\\\\n2\\"]
+node_n34 -> node_n37
+node_n36 -> node_n37
+node_n39 -> node_n38
+node_n40 -> node_n38
+node_n37 -> node_n35
+node_n38 -> node_n35
+node_n41 -> node_n35
 }"
 `;
 
@@ -76,17 +76,17 @@ exports[`if(b==2) {a=2;} else {if(b==1) {a=1;} else {a=0;}} 1`] = `
 "digraph {
 node [shape=box style=filled]
 graph [rankdir=\\"LR\\"]
-node_n22 [label=\\"2\\"]
-node_n24 [label=\\"b\\"]
-node_n25 [label=\\"2\\"]
-node_n23 [label=\\"==\\"]
-node_n26 [label=\\"a\\"]
-node_n21 [label=\\"1\\\\ncond\\\\n2\\"]
-node_n24 -> node_n23
-node_n25 -> node_n23
-node_n22 -> node_n21
-node_n23 -> node_n21
-node_n26 -> node_n21
+node_n28 [label=\\"2\\"]
+node_n30 [label=\\"b\\"]
+node_n31 [label=\\"2\\"]
+node_n29 [label=\\"==\\"]
+node_n32 [label=\\"a\\"]
+node_n27 [label=\\"1\\\\ncond\\\\n2\\"]
+node_n30 -> node_n29
+node_n31 -> node_n29
+node_n28 -> node_n27
+node_n29 -> node_n27
+node_n32 -> node_n27
 }"
 `;
 
@@ -94,19 +94,19 @@ exports[`if(b==2) {b=10;} else {b=2*b;} 1`] = `
 "digraph {
 node [shape=box style=filled]
 graph [rankdir=\\"LR\\"]
-node_n13 [label=\\"10\\"]
-node_n15 [label=\\"b\\"]
-node_n16 [label=\\"2\\"]
-node_n14 [label=\\"==\\"]
-node_n17 [label=\\"2\\"]
-node_n18 [label=\\"*\\\\n*\\"]
-node_n12 [label=\\"1\\\\ncond\\\\n2\\"]
-node_n15 -> node_n14
-node_n16 -> node_n14
-node_n17 -> node_n18
-node_n15 -> node_n18
-node_n13 -> node_n12
-node_n14 -> node_n12
-node_n18 -> node_n12
+node_n17 [label=\\"10\\"]
+node_n19 [label=\\"b\\"]
+node_n20 [label=\\"2\\"]
+node_n18 [label=\\"==\\"]
+node_n21 [label=\\"2\\"]
+node_n22 [label=\\"*\\\\n*\\"]
+node_n16 [label=\\"1\\\\ncond\\\\n2\\"]
+node_n19 -> node_n18
+node_n20 -> node_n18
+node_n21 -> node_n22
+node_n19 -> node_n22
+node_n17 -> node_n16
+node_n18 -> node_n16
+node_n22 -> node_n16
 }"
 `;

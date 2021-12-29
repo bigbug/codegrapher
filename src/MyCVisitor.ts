@@ -1,4 +1,4 @@
-import { ParserRuleContext } from 'antlr4ts';
+import { NoViableAltException, ParserRuleContext } from 'antlr4ts';
 import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor'
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { get, isString } from 'lodash';
@@ -18,7 +18,6 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
 
   constructor() {
     super();
-    this.pushScope("main", "main");
   }
 
   defaultResult() : string {
@@ -31,6 +30,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
 
   private pushScope(name: string, type: ScopeType) {
     this.scopes.push({
+      id: this.id(),
       blocks: [],
       declarations: {},
       name: name,
@@ -412,10 +412,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       return out;
     }
 
-    console.log(blockItemList?.text);
-
-    /*
-    if(assignmentVarIf) {
+    /*if(assignmentVarIf) {
       const ms = this.visitMultiSwitch(leftVar, assignmentVarIf, context);
       
       if(ms) {
@@ -427,7 +424,24 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       }
     }*/
 
-    return this.visitChildren(context);
+    if(blockItemList) {
+      console.log(blockItemList?.text);
+      const cond = this.visit(condition);
+      this.visit(blockItemList);
+      const subscope : Scope = this.scopes[this.scopes.length-1].subscopes[this.scopes[this.scopes.length-1].subscopes.length-1];
+      subscope.blocks.push({
+        type: "activation",
+        configuration: [],
+        inputs: [cond],
+        outputs: [],
+        id: this.id()
+      });
+      return "";
+    }
+
+    console.log("unresolved if");
+    return "";
+    //return this.visitChildren(context);
   }
 
   visitShiftExpression(context: ShiftExpressionContext) : string {
@@ -509,5 +523,16 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     const typeOfDeclaration = context.children?.splice(0, context.children.length-1);
     this.currentDeclarationType = typeOfDeclaration?.map(i=>i.text).join(" ") || "";
     return this.visitChildren(context);
+  }
+
+  visitBlockItemList(ctx: BlockItemListContext) : string {
+    this.pushScope("main", "main");
+    this.visitChildren(ctx);
+
+    if(this.scopes.length>1) {
+      const oldScope:Scope = this.scopes.pop() as Scope;
+      this.scopes[this.scopes.length-1].subscopes.push(oldScope);
+    }
+    return "";
   }
 }

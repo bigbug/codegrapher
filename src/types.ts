@@ -1,4 +1,4 @@
-export type BlockType = "shift"|"gain"|"sum"|"product"|"function"|"abs"|"var"|"and"|"or"|"relational"|"const"|"switch"|"multiply"|"not"|"multiswitch"|"if";
+export type BlockType = "shift"|"gain"|"sum"|"product"|"function"|"abs"|"var"|"and"|"or"|"relational"|"const"|"switch"|"multiply"|"not"|"multiswitch"|"if"|"activation"|"ifmultiplex";
 
 export type ScopeType = "main"|"if"|"function";
 
@@ -15,6 +15,7 @@ export type Block = {
 };
 
 export type Scope = {
+    id: string,
     declarations: {[variable: string]: Declaration},
     variables: {[variable: string]: string},
     blocks: Block[],

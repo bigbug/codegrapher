@@ -82,4 +82,5 @@ test("Declarations 2", () => {
 
 test("ABC", () => {
     const res = visit("int a=2;if(b>0) {a=3;c=4;b=a+c;}");
+    expect(res.scopes[0].subscopes.length).toEqual(1);
 })

@@ -41,6 +41,8 @@ export function generateScope(scope: Scope) : string {
             return nodeid + " [label=\""+i.configuration+"\"]"
         } else if(["function"].includes(i.type)) {
             return nodeid + " [label=\""+i.configuration+"\" color=green]"
+        } else if(["activation"].includes(i.type)) {
+            return nodeid + " [label=\"act\" color=green]"
         } else if (["sum", "multiply", "shift"].includes(i.type)) {
             return nodeid + " [label=\""+(i.configuration as string[]).join("\\n")+"\"]"
         } else if (["relational"].includes(i.type)) {
@@ -59,6 +61,12 @@ export function generateScope(scope: Scope) : string {
             throw new Error("Unsupported node of type '"+i.type+"'");
         }
     }).join("\n") + "\n";
+
+    a += scope.subscopes.map(i=> {
+        return "subgraph cluster_"+i.id+" {"+
+            generateScope(i)
+        +"}";
+    })
 
     a += arrows;
 
