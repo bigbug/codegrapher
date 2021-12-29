@@ -81,7 +81,7 @@ test("function declaraton", () => {
 })
 
 test("arbitrary input", () => {
-    const res = getDigraph(input, false);
+    const res = getDigraph(input, true);
     try {
         fs.writeFileSync('reverselinktargetresult.dot', res)
         //file written successfully

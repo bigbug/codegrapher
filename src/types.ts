@@ -1,6 +1,6 @@
 export type BlockType = "shift"|"gain"|"sum"|"product"|"function"|"abs"|"var"|"and"|"or"|"relational"|"const"|"switch"|"multiply"|"not"|"multiswitch"|"if"|"activation"|"ifmultiplex"|"param"|"return";
 
-export type ScopeType = "main"|"if"|"function";
+export type ScopeType = "main"|"if"|"function"|"for";
 
 export type Declaration = {
     type: string,
@@ -26,4 +26,4 @@ export type Scope = {
     dataStorage?: {returns: string[]}
 }
 
-export type VisitorState = "normal" | "function";
+export type VisitorState = "normal" | "function" | "for";

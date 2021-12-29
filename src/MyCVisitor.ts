@@ -488,10 +488,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     return this.visitChildren(context);
   }
 
-  visitIterationStatement(context: IterationStatementContext) : string {
-    console.log("Iterations are not evaluated!:" + context.text);
-    return "";
-  }
+
 
   visitPrimaryExpression(context: PrimaryExpressionContext) : string {
     // Do not return terminal nodes!
@@ -554,7 +551,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
   }
 
   visitBlockItemList(ctx: BlockItemListContext, type : ScopeType = "main") : string {
-    if(this.visitorState==="function" || (type==="main" && this.scopes[this.scopes.length-1].type==="main")) {
+    if(this.visitorState==="function" || (type==="main" && this.scopes[this.scopes.length-1].type==="main") || this.visitorState==="for") {
       this.visitorState = "normal";
       return this.visitChildren(ctx);
     }
@@ -596,6 +593,24 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       })
     }
 
+    return "";
+  }
+
+  visitIterationStatement(context: IterationStatementContext) : string {
+    if(context.children
+      && context.children.length > 3
+      && context.children[0].text === "for") {
+      //console.log("for");
+      this.visitorState = "for";
+      this.pushScope("", "for");
+      
+      this.visitChildren(context);
+        
+      const functionScope:Scope = this.scopes.pop() as Scope;
+      this.scopes[this.scopes.length-1].subscopes.push(functionScope);
+      return "";
+    }
+    console.log("Iterations are not evaluated!:" + context.text);
     return "";
   }
 
