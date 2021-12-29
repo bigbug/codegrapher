@@ -1,8 +1,6 @@
-int d;
+int max(int num1, int num2) {
 
-/* int max(int num1, int num2) {
-
-   /* local variable declaration 
+   /* local variable declaration */
    int result;
  
    if (num1 > num2) {
@@ -12,4 +10,4 @@ int d;
  
    }
    return result; 
-} */
+}

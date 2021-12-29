@@ -34,6 +34,10 @@ export function generateScope(scope: Scope) : string {
     let a = "";
     let arrows = "";
 
+    if(scope.name!=="") {
+        a += "label=\""+scope.name+"\"\n";
+    }
+
     a += scope.blocks.map(i => {
         const nodeid = "node_" + i.id;
 
