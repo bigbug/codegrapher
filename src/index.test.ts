@@ -75,6 +75,11 @@ test("if pipe with scope", () => {
     expect(generateDigraph(res)).toMatchSnapshot();
 })
 
+test("function declaraton", () => {
+    const res = getDigraph("int max(int num1, int num2) {int result;if (num1 > num2) {result = num1;} else {result = num2;}return result;}", false);
+    expect(res).toMatchSnapshot();
+})
+
 test("arbitrary input", () => {
     const res = getDigraph(input, false);
     try {
