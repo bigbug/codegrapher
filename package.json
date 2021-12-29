@@ -1,6 +1,6 @@
 {
-  "name": "datasolver",
-  "version": "1.0.0",
+  "name": "reverselinktarget",
+  "version": "0.5.1",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
