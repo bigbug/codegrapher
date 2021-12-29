@@ -3,18 +3,19 @@ import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { get, isString } from 'lodash';
 import { CLexer } from './grammars/c/CLexer';
-import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext, IterationStatementContext, ShiftExpressionContext, DirectDeclaratorContext, TypedefNameContext, DeclarationSpecifiersContext, InitDeclaratorContext  } from './grammars/c/CParser';
+import { ArgumentExpressionListContext, AssignmentExpressionContext, UnaryOperatorContext, EqualityExpressionContext, AdditiveExpressionContext, LogicalAndExpressionContext, PostfixExpressionContext, RelationalExpressionContext, SelectionStatementContext, StatementContext, PrimaryExpressionContext, LogicalOrExpressionContext, MultiplicativeExpressionContext, UnaryExpressionContext, CompoundStatementContext, BlockItemListContext, BlockItemContext, IterationStatementContext, ShiftExpressionContext, DirectDeclaratorContext, TypedefNameContext, DeclarationSpecifiersContext, InitDeclaratorContext, FunctionDefinitionContext  } from './grammars/c/CParser';
 import {CVisitor} from './grammars/c/CVisitor'
 import { Block, BlockType, Scope, ScopeType } from './types';
 //import { v4 as uuidv4 } from 'uuid';
 import { ParseTree } from 'antlr4ts/tree/ParseTree';
 
-let idCounter = 1;
 
 // Extend the AbstractParseTreeVisitor to get default visitor behaviour
 export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVisitor<string> {
   public scopes: Scope[] = [];
   private currentDeclarationType = "";
+
+  private idCounter = 1;
 
   constructor() {
     super();
@@ -25,7 +26,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
   }
 
   id(): string {
-    return "n"+ (idCounter++);
+    return "n"+ (this.idCounter++);
   }
 
   private pushScope(name: string, type: ScopeType) {
@@ -535,6 +536,11 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       this.setVariable(ctx.children[0].text, this.visit(ctx.children[2]));
       return "";
     }
+    return this.visitChildren(ctx);
+  }
+
+  visitFunctionDefinition(ctx: FunctionDefinitionContext) : string {
+    console.log(ctx.text);
     return this.visitChildren(ctx);
   }
 }

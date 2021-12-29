@@ -51,17 +51,6 @@ test("b=12;if(a==2) {c=b+34;} else {c=5678;}", () => {
     expect(res).toMatchSnapshot();
 })
 
-test("arbitrary input", () => {
-    const res = getDigraph(input);
-    //console.log(res);
-    try {
-        fs.writeFileSync('reverselinktargetresult.dot', res)
-        //file written successfully
-      } catch (err) {
-        console.error(err)
-      }
-});
-
 test("Declarations 1", () => {
     const res = visit("int d;");
     expect(res.scopes[0].declarations["d"]).toBeDefined();
@@ -85,3 +74,14 @@ test("if pipe with scope", () => {
     expect(res.scopes[0].subscopes.length).toEqual(1);
     expect(generateDigraph(res)).toMatchSnapshot();
 })
+
+test("arbitrary input", () => {
+    const res = getDigraph(input);
+    //console.log(res);
+    try {
+        fs.writeFileSync('reverselinktargetresult.dot', res)
+        //file written successfully
+      } catch (err) {
+        console.error(err)
+      }
+});
