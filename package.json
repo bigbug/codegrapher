@@ -1,6 +1,6 @@
 {
-  "name": "reverselinktarget",
-  "version": "0.5.1",
+  "name": "codegrapher",
+  "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -28,7 +28,6 @@
     "antlr4": "^4.9.2",
     "antlr4ts": "^0.5.0-alpha.4",
     "lodash": "^4.17.21",
-    "object-hash": "^2.2.0",
-    "uuid": "^8.3.2"
+    "object-hash": "^2.2.0"
   }
 }
