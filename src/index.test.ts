@@ -100,6 +100,11 @@ test("pre decrement", () => {
     expect(res).toMatchSnapshot();
 })
 
+test("assignements", () => {
+    const res = getDigraph("a+=2;a-=2;a*=2;a/=2;test(a);");
+    expect(res).toMatchSnapshot();
+})
+
 test("arbitrary input", () => {
     const res = getDigraph(input, true);
     try {

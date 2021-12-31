@@ -71,6 +71,53 @@ node_n3 -> \\"node_n4\\":f1
 }"
 `;
 
+exports[`assignements 1`] = `
+"digraph {
+node [shape=box style=filled]
+graph [rankdir=\\"LR\\"]
+node_n2 [label=\\"2\\"]
+node_n3 [label=\\"a\\"]
+node_n4 [
+label=\\"<f0> + | <f1> +\\"
+shape=\\"record\\"
+]
+node_n5 [label=\\"2\\"]
+node_n6 [
+label=\\"<f0> + | <f1> -\\"
+shape=\\"record\\"
+]
+node_n7 [label=\\"2\\"]
+node_n8 [
+label=\\"<f0> * | <f1> *\\"
+shape=\\"record\\"
+]
+node_n9 [label=\\"2\\"]
+node_n10 [
+label=\\"<f0> * | <f1> /\\"
+shape=\\"record\\"
+]
+node_n11 [label=\\"test\\" color=green]
+node_n3 -> node_n4 [color=transparent]
+node_n2 -> node_n4 [color=transparent]
+node_n4 -> node_n6 [color=transparent]
+node_n5 -> node_n6 [color=transparent]
+node_n6 -> node_n8 [color=transparent]
+node_n7 -> node_n8 [color=transparent]
+node_n8 -> node_n10 [color=transparent]
+node_n9 -> node_n10 [color=transparent]
+node_n10 -> node_n11 [color=transparent]
+node_n3 -> \\"node_n4\\":f0
+node_n2 -> \\"node_n4\\":f1
+node_n4 -> \\"node_n6\\":f0 [label=\\"a\\"]
+node_n5 -> \\"node_n6\\":f1
+node_n6 -> \\"node_n8\\":f0 [label=\\"a\\"]
+node_n7 -> \\"node_n8\\":f1
+node_n8 -> \\"node_n10\\":f0 [label=\\"a\\"]
+node_n9 -> \\"node_n10\\":f1
+node_n10 -> \\"node_n11\\":f0 [label=\\"a\\"]
+}"
+`;
+
 exports[`b=12;if(a==2) {c=b+34;} else {c=5678;} 1`] = `
 "digraph {
 node [shape=box style=filled]

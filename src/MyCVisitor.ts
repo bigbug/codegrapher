@@ -109,16 +109,12 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       if(operator == "=") {
         this.setVariable(leftVar, expression);
         return "";
-      } else if(operator === "+=") {
-        const operators = ["+", "+"];
+      } else if(["+=", "-=", "*=", "/="].includes(operator)) {
+        const dict:{[variable:string]:string[]} = {"+=": ["+","+"], "-=": ["+", "-"], "*=": ["*","*"], "/=": ["*", "/"]}
+        const operators : string[] = dict[operator];
         const parts = [this.useVariable(leftVar), expression];
         const output = this.id();
-        this.addBlock("sum", parts, [output], operators);
-        return output;
-      } else if(operator === "-=") {
-        const operators = ["+", "-"];
-        const parts = [this.useVariable(leftVar), expression];
-        const output = this.id();
+        this.setVariable(leftVar, output);
         this.addBlock("sum", parts, [output], operators);
         return output;
       } else {
