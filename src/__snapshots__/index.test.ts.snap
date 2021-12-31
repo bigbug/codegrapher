@@ -178,3 +178,51 @@ node_n4 -> node_n2
 node_n8 -> node_n2
 }"
 `;
+
+exports[`post decrement 1`] = `
+"digraph {
+node [shape=box style=filled]
+graph [rankdir=\\"LR\\"]
+node_n2 [label=\\"i\\"]
+node_n4 [label=\\"1\\"]
+node_n3 [label=\\"+\\\\n-\\"]
+node_n2 -> node_n3
+node_n4 -> node_n3
+}"
+`;
+
+exports[`post increment 1`] = `
+"digraph {
+node [shape=box style=filled]
+graph [rankdir=\\"LR\\"]
+node_n2 [label=\\"i\\"]
+node_n4 [label=\\"1\\"]
+node_n3 [label=\\"+\\\\n+\\"]
+node_n2 -> node_n3
+node_n4 -> node_n3
+}"
+`;
+
+exports[`pre decrement 1`] = `
+"digraph {
+node [shape=box style=filled]
+graph [rankdir=\\"LR\\"]
+node_n2 [label=\\"i\\"]
+node_n4 [label=\\"1\\"]
+node_n3 [label=\\"+\\\\n-\\"]
+node_n2 -> node_n3
+node_n4 -> node_n3
+}"
+`;
+
+exports[`pre increment 1`] = `
+"digraph {
+node [shape=box style=filled]
+graph [rankdir=\\"LR\\"]
+node_n2 [label=\\"i\\"]
+node_n4 [label=\\"1\\"]
+node_n3 [label=\\"+\\\\n+\\"]
+node_n2 -> node_n3
+node_n4 -> node_n3
+}"
+`;

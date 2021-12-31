@@ -82,22 +82,22 @@ test("function declaraton", () => {
 
 test("post increment", () => {
     const res = getDigraph("i++;b=i;");
-    expect(res).toEqual("");
+    expect(res).toMatchSnapshot();
 })
 
 test("post decrement", () => {
     const res = getDigraph("i--;b=i;");
-    expect(res).toEqual("");
+    expect(res).toMatchSnapshot();
 })
 
 test("pre increment", () => {
     const res = getDigraph("++i;b=i;");
-    expect(res).toEqual("");
+    expect(res).toMatchSnapshot();
 })
 
 test("pre decrement", () => {
     const res = getDigraph("--i;b=i;");
-    expect(res).toEqual("");
+    expect(res).toMatchSnapshot();
 })
 
 test("arbitrary input", () => {
