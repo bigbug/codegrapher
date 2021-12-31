@@ -93,6 +93,12 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     return block.id;
   }
 
+  private popScope() : Scope {
+    const scope:Scope = this.scopes.pop() as Scope;
+    this.scopes[this.scopes.length-1].subscopes.push(scope);
+    return scope;
+  }
+
   visitAssignmentExpression(context: AssignmentExpressionContext) : string {
     const leftVar = get(context, "children[0].text");
     if(context.children
@@ -611,8 +617,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     this.visitChildren(ctx);
 
     if(this.scopes.length>1) {
-      const oldScope:Scope = this.scopes.pop() as Scope;
-      this.scopes[this.scopes.length-1].subscopes.push(oldScope);
+      this.popScope();
     }
     return "";
   }
@@ -670,9 +675,16 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       });
       
       this.visit(context.children[4]);
+      
+      const functionScope = this.popScope();
 
-      const functionScope:Scope = this.scopes.pop() as Scope;
-      this.scopes[this.scopes.length-1].subscopes.push(functionScope);
+      const multiplexVars = Object.keys(functionScope.variables).filter(variable => !functionScope.declarations[variable]);
+      multiplexVars.forEach(variable => {
+        const output = this.id();
+        this.addBlock("formultiplex", [this.useVariable(variable), functionScope.variables[variable]], [output]);
+        this.setVariable(variable, output);
+      });
+
       return "";
     }
     console.log("Iterations are not evaluated!:" + context.text);

@@ -1,4 +1,4 @@
-export type BlockType = "shift"|"gain"|"sum"|"product"|"function"|"abs"|"var"|"and"|"or"|"relational"|"const"|"switch"|"multiply"|"not"|"multiswitch"|"if"|"activation"|"ifmultiplex"|"param"|"return"|"iterationVariable";
+export type BlockType = "shift"|"gain"|"sum"|"product"|"function"|"abs"|"var"|"and"|"or"|"relational"|"const"|"switch"|"multiply"|"not"|"multiswitch"|"if"|"activation"|"ifmultiplex"|"formultiplex"|"param"|"return"|"iterationVariable";
 
 export type ScopeType = "main"|"if"|"function"|"for";
 
