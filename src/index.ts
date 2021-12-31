@@ -46,7 +46,7 @@ export function generateScope(scope: Scope) : string {
             const label = scope.varHistory[j] ? " [label=\""+scope.varHistory[j]+"\"]" : "";
             const z = "node_" + j;
             invisarrows += z + " -> " + nodeid + " [color=transparent]\n";
-            arrows += z + " -> " + "\"" +nodeid + "\""+":f"+jdx + label + "\n";
+            arrows += z + " -> "  +nodeid +":f"+jdx + label + "\n";
         });
 
         if(["var", "const"].includes(i.type)) {
