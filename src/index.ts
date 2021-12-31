@@ -87,7 +87,7 @@ export function generateScope(scope: Scope) : string {
         return "subgraph cluster_"+i.id+" {"+
             generateScope(i)
         +"}";
-    })
+    }).join("\n");
 
     a += invisarrows + arrows;
 

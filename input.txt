@@ -1,6 +1,20 @@
-a=2;
-for(int i =0; i<10; i++) {
-    a += i;
+/*a = 1;
+a = a+2;
+b = a;
+a+=3;
+a-=4;
+a*=5;
+a/=6;
+
+c = a+b;*/
+
+int a;
+
+int main() {
+    a = 23;
+    return a;
 }
 
-b = a+2;
+int function2() {
+    a = 12;
+}

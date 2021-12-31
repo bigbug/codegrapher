@@ -111,7 +111,7 @@ test("for loop", () => {
 })
 
 test("arbitrary input", () => {
-    const res = getDigraph(input, true);
+    const res = getDigraph(input, false);
     try {
         fs.writeFileSync('reverselinktargetresult.dot', res)
         //file written successfully
