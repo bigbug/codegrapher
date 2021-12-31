@@ -155,6 +155,38 @@ node_n9 -> \\"node_n3\\":f2
 }"
 `;
 
+exports[`for loop 1`] = `
+"digraph {
+node [shape=box style=filled]
+graph [rankdir=\\"LR\\"]
+node_n2 [label=\\"2\\"]
+node_n11 [label=\\"pipe\\"]
+node_n12 [label=\\"2\\"]
+node_n13 [
+label=\\"<f0> + | <f1> +\\"
+shape=\\"record\\"
+]
+subgraph cluster_n3 {label=\\"for(inti=0;i<10;i++)\\"
+node_n9 [label=\\"i\\" color=orange]
+node_n10 [
+label=\\"<f0> + | <f1> +\\"
+shape=\\"record\\"
+]
+node_n2 -> node_n10 [color=transparent]
+node_n9 -> node_n10 [color=transparent]
+node_n2 -> \\"node_n10\\":f0
+node_n9 -> \\"node_n10\\":f1 [label=\\"i\\"]
+}node_n2 -> node_n11 [color=transparent]
+node_n10 -> node_n11 [color=transparent]
+node_n11 -> node_n13 [color=transparent]
+node_n12 -> node_n13 [color=transparent]
+node_n2 -> \\"node_n11\\":f0 [label=\\"a\\"]
+node_n10 -> \\"node_n11\\":f1
+node_n11 -> \\"node_n13\\":f0 [label=\\"a\\"]
+node_n12 -> \\"node_n13\\":f1
+}"
+`;
+
 exports[`function declaraton 1`] = `
 "digraph {
 node [shape=box style=filled]

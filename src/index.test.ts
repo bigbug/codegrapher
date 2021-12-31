@@ -105,6 +105,11 @@ test("assignements", () => {
     expect(res).toMatchSnapshot();
 })
 
+test("for loop", () => {
+    const res = getDigraph("a=2;for(int i=0;i<10;i++){a+=i;}b=a+2;");
+    expect(res).toMatchSnapshot();
+})
+
 test("arbitrary input", () => {
     const res = getDigraph(input, true);
     try {
