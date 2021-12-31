@@ -80,6 +80,26 @@ test("function declaraton", () => {
     expect(res).toMatchSnapshot();
 })
 
+test("post increment", () => {
+    const res = getDigraph("i++;b=i;");
+    expect(res).toEqual("");
+})
+
+test("post decrement", () => {
+    const res = getDigraph("i--;b=i;");
+    expect(res).toEqual("");
+})
+
+test("pre increment", () => {
+    const res = getDigraph("++i;b=i;");
+    expect(res).toEqual("");
+})
+
+test("pre decrement", () => {
+    const res = getDigraph("--i;b=i;");
+    expect(res).toEqual("");
+})
+
 test("arbitrary input", () => {
     const res = getDigraph(input, true);
     try {

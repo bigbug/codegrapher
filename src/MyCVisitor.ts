@@ -226,6 +226,30 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       && context.children[0].children[0] instanceof TerminalNode
       && context.children[0].children[0]._symbol.type === CLexer.Identifier
     ) {
+      if(context.children[1] instanceof TerminalNode
+        && context.children[1]._symbol.type === CLexer.PlusPlus) {
+          const varName = context.children[0].text;
+          const id = this.useVariable(varName);
+
+          const output = this.id();
+          const constant = this.useConstant("1");
+          this.addBlock("sum", [id, constant], [output], ["+", "+"]);
+          this.setVariable(varName, output);
+
+          return id;
+        }
+      else if(context.children[1] instanceof TerminalNode
+        && context.children[1]._symbol.type === CLexer.MinusMinus) {
+          const varName = context.children[0].text;
+          const id = this.useVariable(varName);
+
+          const output = this.id();
+          const constant = this.useConstant("1");
+          this.addBlock("sum", [id, constant], [output], ["+", "-"]);
+          this.setVariable(varName, output);
+
+          return id;
+        }
       return this.useVariable(context.text);
     }
 
@@ -244,7 +268,6 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
 
     //throw new Error("unresolved postfix: " + context.text);
     return this.visitChildren(context);
-    //return "";
   }
 
   visitMultiSwitch(conditionVariable: string, assignmentVar: string, context: SelectionStatementContext) : {
@@ -481,6 +504,27 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       this.addBlock("gain", params, [out], "-1");
       return out;
     }
+
+    if(context.children
+      && context.children.length===2
+      && context.children[0] instanceof TerminalNode
+      && [CLexer.PlusPlus, CLexer.MinusMinus].includes(context.children[0]._symbol.type)
+      && context.children[1] instanceof PostfixExpressionContext) {
+        const varName = context.children[1].text;
+        const id = this.useVariable(varName);
+
+        const output = this.id();
+        const constant = this.useConstant("1");
+        if(context.children[0]._symbol.type === CLexer.PlusPlus) {
+          this.addBlock("sum", [id, constant], [output], ["+", "+"]);
+        } else if(context.children[0]._symbol.type === CLexer.MinusMinus) {
+          this.addBlock("sum", [id, constant], [output], ["+", "-"]);
+        }
+        this.setVariable(varName, output);
+
+        return output;
+      }
+
     return this.visitChildren(context);
   }
 
@@ -604,8 +648,19 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       this.visitorState = "for";
       this.pushScope("", "for");
       
-      this.visitChildren(context);
-        
+      this.visit(context.children[2]);
+
+      const forVars = this.scopes[this.scopes.length-1].variables;
+      //const forBlocks = this.scopes[this.scopes.length-1].blocks;
+
+      this.scopes[this.scopes.length-1].blocks = [];
+      Object.keys(forVars).forEach(variable => {
+        const id = this.useConstant(variable);
+        this.setVariable(variable, id);
+      });
+      
+      this.visit(context.children[4]);
+
       const functionScope:Scope = this.scopes.pop() as Scope;
       this.scopes[this.scopes.length-1].subscopes.push(functionScope);
       return "";
