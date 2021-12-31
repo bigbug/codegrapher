@@ -3,7 +3,7 @@ import { ParseTree } from 'antlr4ts/tree/ParseTree';
 import {CLexer} from "./grammars/c/CLexer";
 import {BlockItemListContext, CompilationUnitContext, CParser} from "./grammars/c/CParser";
 import { MyCVisitor } from './MyCVisitor';
-import { Block, Scope } from './types';
+import { Scope } from './types';
 
 export function toTree(input: string, parts = true) : ParseTree {
     // Create the lexer and parser
@@ -33,6 +33,7 @@ export function generateScope(scope: Scope) : string {
 
     let a = "";
     let arrows = "";
+    let invisarrows = "";
 
     if(scope.name!=="") {
         a += "label=\""+scope.name+"\"\n";
@@ -41,10 +42,11 @@ export function generateScope(scope: Scope) : string {
     a += scope.blocks.map(i => {
         const nodeid = "node_" + i.id;
 
-        i.inputs.forEach(j=>{
+        i.inputs.forEach((j,jdx)=>{
             const label = scope.varHistory[j] ? " [label=\""+scope.varHistory[j]+"\"]" : "";
             const z = "node_" + j;
-            arrows += z + " -> " + nodeid + label + "\n";
+            invisarrows += z + " -> " + nodeid + " [color=transparent]\n";
+            arrows += z + " -> " + "\"" +nodeid + "\""+":f"+jdx + label + "\n";
         });
 
         if(["var", "const"].includes(i.type)) {
@@ -60,9 +62,10 @@ export function generateScope(scope: Scope) : string {
         } else if(["activation"].includes(i.type)) {
             return nodeid + " [label=\"act\" color=green]"
         } else if (["sum", "multiply", "shift"].includes(i.type)) {
-            return nodeid + " [label=\""+(i.configuration as string[]).join("\\n")+"\"]"
+            return nodeid + " [\nlabel=\""+(i.configuration as string[]).map((j, jdx)=>"<f"+jdx+"> " + j).join(" | ")+"\"\nshape=\"record\"\n]"
         } else if (["relational"].includes(i.type)) {
-            return nodeid + " [label=\""+(i.configuration as string)+"\"]"
+            //return nodeid + " [label=\""+(i.configuration as string)+"\"]"
+            return nodeid + " [\nlabel=\""+(i.inputs as string[]).map((j, jdx)=>"<f"+jdx+"> " + i.configuration).join(" | ")+"\"\nshape=\"record\"\n]"
         } else if (["and", "or"].includes(i.type)) {
             return nodeid + " [label=\""+(i.type==="and" ? "&&" : "||")+"\"]"
         } else if (["abs", "not"].includes(i.type)) {
@@ -70,7 +73,7 @@ export function generateScope(scope: Scope) : string {
         } else if (["gain"].includes(i.type)) {
             return nodeid + " [label=\""+i.configuration+"\"]"
         } else if (["switch"].includes(i.type)) {
-            return nodeid + " [label=\"1\\ncond\\n2\"]"
+            return nodeid + " [\nlabel=\"<f0> 1| <f1> cond | <f2> 2\"shape=\"record\"\n]"
         } else if (["multiswitch"].includes(i.type)) {
             return nodeid + " [label=\"cond\\n"+i.configuration+"\"]"
         } else if (["ifmultiplex"].includes(i.type)) {
@@ -86,7 +89,7 @@ export function generateScope(scope: Scope) : string {
         +"}";
     })
 
-    a += arrows;
+    a += invisarrows + arrows;
 
     return a;
 }
