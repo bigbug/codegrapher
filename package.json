@@ -9,8 +9,13 @@
     "test": "jest --config jestconfig.json --watchAll",
     "antlr4ts": "antlr4ts -visitor src/grammars/c/C.g4"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Markus Gutbrod <gutbrod.markus@googlemail.com>",
+  "private": false,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bigbug/codegrapher.git"
+  },
   "devDependencies": {
     "@types/jest": "^27.0.2",
     "@types/lodash": "^4.14.175",
