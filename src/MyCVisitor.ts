@@ -41,6 +41,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       type: type,
       subscopes: [],
       variables: {},
+      varHistory: {}
     });
   }
 
@@ -64,11 +65,18 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
 
   private setVariable(v: string, newValue:string) : void {
     this.scopes[this.scopes.length-1].variables[v] = newValue;
+    this.scopes[this.scopes.length-1].varHistory[newValue] = v;
   }
 
   private useConstant(v: string) : string {
     const id = this.id();
     this.addBlock("const", [], [id], v);
+    return id;
+  }
+
+  private useIteration(v: string) : string {
+    const id = this.id();
+    this.addBlock("iterationVariable", [], [id], v);
     return id;
   }
 
@@ -649,13 +657,15 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       this.pushScope("for", "for");
       
       this.visit(context.children[2]);
+      this.scopes[this.scopes.length-1].name = "for("+context.children[2].text + ")";
 
       const forVars = this.scopes[this.scopes.length-1].variables;
       //const forBlocks = this.scopes[this.scopes.length-1].blocks;
 
       this.scopes[this.scopes.length-1].blocks = [];
       Object.keys(forVars).forEach(variable => {
-        const id = this.useConstant(variable);
+        //const id = this.useConstant(variable);
+        const id = this.useIteration(variable);
         this.setVariable(variable, id);
       });
       

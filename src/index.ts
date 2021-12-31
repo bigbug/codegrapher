@@ -42,7 +42,7 @@ export function generateScope(scope: Scope) : string {
         const nodeid = "node_" + i.id;
 
         i.inputs.forEach(j=>{
-            const label = /*v.varHistory[j] ? " [label=\""+v.varHistory[j]+"\"]" : */"";
+            const label = scope.varHistory[j] ? " [label=\""+scope.varHistory[j]+"\"]" : "";
             const z = "node_" + j;
             arrows += z + " -> " + nodeid + label + "\n";
         });
@@ -50,6 +50,8 @@ export function generateScope(scope: Scope) : string {
         if(["var", "const"].includes(i.type)) {
             return nodeid + " [label=\""+i.configuration+"\"]"
         } else if(["param"].includes(i.type)) {
+            return nodeid + " [label=\""+i.configuration+"\" color=orange]"
+        } else if(["iterationVariable"].includes(i.type)) {
             return nodeid + " [label=\""+i.configuration+"\" color=orange]"
         } else if(["return"].includes(i.type)) {
             return nodeid + " [label=\"return\" color=orange]"
