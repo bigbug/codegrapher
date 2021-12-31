@@ -646,7 +646,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       && context.children[0].text === "for") {
       //console.log("for");
       this.visitorState = "for";
-      this.pushScope("", "for");
+      this.pushScope("for", "for");
       
       this.visit(context.children[2]);
 
