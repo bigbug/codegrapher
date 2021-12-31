@@ -65,7 +65,7 @@ export function generateScope(scope: Scope) : string {
             return nodeid + " [\nlabel=\""+(i.configuration as string[]).map((j, jdx)=>"<f"+jdx+"> " + j).join(" | ")+"\"\nshape=\"record\"\n]"
         } else if (["relational"].includes(i.type)) {
             //return nodeid + " [label=\""+(i.configuration as string)+"\"]"
-            return nodeid + " [\nlabel=\""+(i.inputs as string[]).map((j, jdx)=>"<f"+jdx+"> " + i.configuration).join(" | ")+"\"\nshape=\"record\"\n]"
+            return nodeid + " [\nlabel=\""+(i.configuration as string)+" |"+(i.inputs as string[]).map((j, jdx)=>"<f"+jdx+"> ").join(" | ")+"\"\nshape=\"record\"\n]"
         } else if (["and", "or"].includes(i.type)) {
             return nodeid + " [label=\""+(i.type==="and" ? "&&" : "||")+"\"]"
         } else if (["abs", "not"].includes(i.type)) {
