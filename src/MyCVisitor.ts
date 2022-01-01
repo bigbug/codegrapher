@@ -632,8 +632,8 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     const type : ParseTree[] = ctx.children?.splice(0,1) as ParseTree[];
     this.pushScope("("+type[0].text+")", "function");
     this.visitChildren(ctx);
-    const functionScope:Scope = this.scopes.pop() as Scope;
-    this.scopes[this.scopes.length-1].subscopes.push(functionScope);
+
+    const functionScope = this.popScope();
     
     const returns = functionScope.dataStorage?.returns;
     if(returns && returns.length>=1) {

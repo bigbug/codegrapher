@@ -1,20 +1,10 @@
-/*a = 1;
-a = a+2;
-b = a;
-a+=3;
-a-=4;
-a*=5;
-a/=6;
-
-c = a+b;*/
-
-int a;
-
-int main() {
-    a = 23;
-    return a;
+d=0;
+int main(int a, int b, char c) {
+    d = a;
+    return a+b+c;
 }
 
-int function2() {
-    a = 12;
+int function2(int a) {
+    b = a;
+    return a;
 }
