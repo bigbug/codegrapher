@@ -48,23 +48,46 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
   private useVariable(v: string) : string {
     for(let i = this.scopes.length-1; i>=0; i--) {
       if(this.scopes[i].variables[v]) {
-        return this.scopes[i].variables[v];
+        if(i===0 && this.scopes.length>1 && !this.scopes[0].variables[v].target) {
+          const currentOutput = this.id();
+
+          this.scopes[i].variables[v].target = {
+            type: "var",
+            inputs: [this.scopes[i].variables[v].currentOutput],
+            outputs: [currentOutput],
+            configuration: v,
+            id: currentOutput,
+          };
+          this.scopes[i].blocks.push(this.scopes[0].variables[v].target as Block);
+          this.scopes[i].variables[v].currentOutput = currentOutput;
+        }
+        return this.scopes[i].variables[v].currentOutput;
       }
     }
 
-    this.scopes[0].variables[v] = this.id();
-    this.scopes[0].blocks.push({
-      type: "var",
-      inputs: [],
-      outputs: [this.scopes[0].variables[v]],
-      configuration: v,
-      id: this.scopes[0].variables[v],
-    });
-    return this.scopes[0].variables[v];
+    const currentOutput = this.id();
+
+    this.scopes[0].variables[v] = {
+      currentOutput,
+      target: {
+        type: "var",
+        inputs: [],
+        outputs: [currentOutput],
+        configuration: v,
+        id: currentOutput,
+      }
+    };
+    this.scopes[0].blocks.push(this.scopes[0].variables[v].target as Block);
+    return currentOutput;
   }
 
   private setVariable(v: string, newValue:string) : void {
-    this.scopes[this.scopes.length-1].variables[v] = newValue;
+    if(!this.scopes[this.scopes.length-1].variables[v]) {
+      this.scopes[this.scopes.length-1].variables[v] = {
+        currentOutput: newValue
+      }
+    }
+    this.scopes[this.scopes.length-1].variables[v].currentOutput = newValue;
     this.scopes[this.scopes.length-1].varHistory[newValue] = v;
   }
 
@@ -464,7 +487,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       const multiplexVars = Object.keys(subscope.variables).filter(variable => !subscope.declarations[variable]);
       multiplexVars.forEach(variable => {
         const output = this.id();
-        this.addBlock("ifmultiplex", [activationId, this.useVariable(variable), subscope.variables[variable]], [output]);
+        this.addBlock("ifmultiplex", [activationId, this.useVariable(variable), subscope.variables[variable].currentOutput], [output]);
         this.setVariable(variable, output);
       });
       return "";
@@ -573,10 +596,11 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
   }
   visitDirectDeclarator(context: DirectDeclaratorContext) : string {
     if(context.children
-      && context.children.length===4
+      && context.children.length>=3
+      && context.children.length<=4
       && this.visitorState==="function"
       && context.children[1].text==="("
-      && context.children[3].text===")") {
+      && context.children[context.children.length-1].text===")") {
         this.scopes[this.scopes.length-1].name += (context.children.splice(0,1) as ParseTree[])[0].text;
       }
 
@@ -634,7 +658,15 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
     this.visitChildren(ctx);
 
     const functionScope = this.popScope();
-    
+
+    const multiplexVars = Object.keys(functionScope.variables).filter(variable => !functionScope.declarations[variable]);
+
+    multiplexVars.forEach(variable => {
+      if(this.scopes[this.scopes.length-1].variables[variable] && this.scopes[this.scopes.length-1].variables[variable].target) {
+        this.scopes[this.scopes.length-1].variables[variable].target?.inputs.push(functionScope.variables[variable].currentOutput);
+      }
+    })
+
     const returns = functionScope.dataStorage?.returns;
     if(returns && returns.length>=1) {
       functionScope.blocks.push({
@@ -677,7 +709,7 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       const multiplexVars = Object.keys(functionScope.variables).filter(variable => !functionScope.declarations[variable]);
       multiplexVars.forEach(variable => {
         const output = this.id();
-        this.addBlock("formultiplex", [this.useVariable(variable), functionScope.variables[variable]], [output]);
+        this.addBlock("formultiplex", [this.useVariable(variable), functionScope.variables[variable].currentOutput], [output]);
         this.setVariable(variable, output);
       });
 

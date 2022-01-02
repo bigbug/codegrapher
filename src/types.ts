@@ -18,7 +18,7 @@ export type Block = {
 export type Scope = {
     id: string,
     declarations: {[variable: string]: Declaration},
-    variables: {[variable: string]: string},
+    variables: {[variable: string]: {currentOutput: string, target?: Block}},
     blocks: Block[],
     type: ScopeType,
     name: string,
