@@ -19,7 +19,7 @@
             "port": 9229
           },
         {
-            "name": "Debug ANTLR CompilationUnoit",
+            "name": "Debug ANTLR CompilationUnit",
             "type": "antlr-debug",
             "request": "launch",
             "input": "input.txt",
