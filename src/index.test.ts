@@ -110,6 +110,11 @@ test("for loop", () => {
     expect(res).toMatchSnapshot();
 })
 
+test("string", () => {
+    const res = getDigraph("abc = \"test\" + \"data\";");
+    expect(res).toMatchSnapshot();
+})
+
 test("arbitrary input", () => {
     const res = getDigraph(input, false);
     try {

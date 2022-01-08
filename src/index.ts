@@ -48,9 +48,11 @@ export function generateScope(scope: Scope) : string {
             invisarrows += z + " -> " + nodeid + " [color=transparent]\n";
             arrows += z + " -> "  +nodeid +":f"+jdx + label + "\n";
         });
-
-        if(["var", "const"].includes(i.type)) {
+        
+        if(["var"].includes(i.type)) {
             return nodeid + " [label=\""+i.configuration+"\"]"
+        } else if(["const"].includes(i.type)) {
+            return nodeid + " [label=\""+(i.configuration as string).replace(/"/g, "\\\"")+"\"]"
         } else if(["param"].includes(i.type)) {
             return nodeid + " [label=\""+i.configuration+"\" color=orange]"
         } else if(["iterationVariable"].includes(i.type)) {

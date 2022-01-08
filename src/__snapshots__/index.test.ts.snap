@@ -434,3 +434,20 @@ node_n2 -> node_n3:f0
 node_n4 -> node_n3:f1
 }"
 `;
+
+exports[`string 1`] = `
+"digraph {
+node [shape=box style=filled]
+graph [rankdir=\\"LR\\"]
+node_n2 [label=\\"\\\\\\"test\\\\\\"\\"]
+node_n3 [label=\\"\\\\\\"data\\\\\\"\\"]
+node_n4 [
+label=\\"<f0> + | <f1> +\\"
+shape=\\"record\\"
+]
+node_n2 -> node_n4 [color=transparent]
+node_n3 -> node_n4 [color=transparent]
+node_n2 -> node_n4:f0
+node_n3 -> node_n4:f1
+}"
+`;

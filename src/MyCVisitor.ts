@@ -733,4 +733,11 @@ export class MyCVisitor extends AbstractParseTreeVisitor<string> implements CVis
       }
     return "";
   }
+
+  visitTerminal(node: TerminalNode): string {
+      if(node._symbol.type === CLexer.StringLiteral) {
+        return this.useConstant(node.text);
+      }
+      return "";
+  }
 }

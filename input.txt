@@ -3,11 +3,11 @@
 int d = 1+2;
 
 int main(int a, int b, char c) {
-    a = d;
+    a = "abc";
     return a+b+c;
 }
 
-int function2(int a) {
+/*int function2(int a) {
     a=d;
     for(int i=0;i<10;i++){
         a+=i;
@@ -29,4 +29,4 @@ int fibonacci()
   n2=n3;    
  }  
   return 0;  
- }    
+ }*/
