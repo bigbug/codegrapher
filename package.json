@@ -1,13 +1,14 @@
 {
   "name": "codegrapher",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "jest --config jestconfig.json --watchAll",
-    "antlr4ts": "antlr4ts -visitor src/grammars/c/C.g4"
+    "antlr4ts": "antlr4ts -visitor src/grammars/c/C.g4",
+    "prepack": "npm run build"
   },
   "author": "Markus Gutbrod <gutbrod.markus@googlemail.com>",
   "private": false,
