@@ -199,7 +199,7 @@ subgraph cluster_n2 {label=\\"(int)max\\"
 node_n3 [label=\\"num1\\" color=orange]
 node_n4 [label=\\"num2\\" color=orange]
 node_n6 [
-label=\\"> |<f0>  | <f1> \\"
+label=\\"\\\\> |<f0>  | <f1> \\"
 shape=\\"record\\"
 ]
 node_n5 [

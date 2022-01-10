@@ -64,10 +64,9 @@ export function generateScope(scope: Scope) : string {
         } else if(["activation"].includes(i.type)) {
             return nodeid + " [label=\"act\" color=green]"
         } else if (["sum", "multiply", "shift"].includes(i.type)) {
-            return nodeid + " [\nlabel=\""+(i.configuration as string[]).map((j, jdx)=>"<f"+jdx+"> " + j).join(" | ")+"\"\nshape=\"record\"\n]"
+            return nodeid + " [\nlabel=\""+(i.configuration as string[]).map((j, jdx)=>"<f"+jdx+"> " + j.replace(/([<>])/g, "\\$1")).join(" | ")+"\"\nshape=\"record\"\n]"
         } else if (["relational"].includes(i.type)) {
-            //return nodeid + " [label=\""+(i.configuration as string)+"\"]"
-            return nodeid + " [\nlabel=\""+(i.configuration as string)+" |"+(i.inputs as string[]).map((j, jdx)=>"<f"+jdx+"> ").join(" | ")+"\"\nshape=\"record\"\n]"
+            return nodeid + " [\nlabel=\""+(i.configuration as string).replace(/([<>])/g, "\\$1")+" |"+(i.inputs as string[]).map((j, jdx)=>"<f"+jdx+"> ").join(" | ")+"\"\nshape=\"record\"\n]"
         } else if (["and", "or"].includes(i.type)) {
             return nodeid + " [label=\""+(i.type==="and" ? "&&" : "||")+"\"]"
         } else if (["abs", "not"].includes(i.type)) {
